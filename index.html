@@ -157,14 +157,14 @@
   <div id="previewArea"></div>
   <div id="statsPanel">
     <h2>Statistiques du texte</h2>
-    <p><strong>Nombre total de liens :</strong> <span id="totalLinks">0</span></p>
-    <p><strong>Pourcentage de texte enrichi :</strong> <span id="enrichedPercent">0%</span></p>
-    <p><strong>Nombre de doublons :</strong> <span id="duplicateLinks">0</span></p>
-    <p><strong>Nombre de liens par catégorie :</strong></p>
+    <p><strong>Number of links :</strong> <span id="totalLinks">0</span></p>
+    <p><strong>Link % :</strong> <span id="enrichedPercent">0%</span></p>
+    <p><strong>Double links :</strong> <span id="duplicateLinks">0</span></p>
+    <p><strong>Category repartition :</strong></p>
     <ul>
-      <li>Priorité 1 : <span id="cat1">0</span></li>
-      <li>Priorité 2 : <span id="cat2">0</span></li>
-      <li>Priorité 3 : <span id="cat3">0</span></li>
+      <li>Articles : <span id="cat1">0</span></li>
+      <li>Models : <span id="cat2">0</span></li>
+      <li>Brands : <span id="cat3">0</span></li>
     </ul>
   </div>
 </div>
@@ -175,26 +175,15 @@
       <input type="text" id="customWord" placeholder="Keyword (ex: Tesla Model Y)">
       <input type="text" id="customURL" placeholder="URL (ex: https://en.wikipedia.org/wiki/Tesla_Model_Y)">
       <select id="customPriority">
-        <option value="0">Priority 1</option>
-        <option value="1">Priority 2</option>
-        <option value="2">Priority 3</option>
+        <option value="0">Articles</option>
+        <option value="1">Models</option>
+        <option value="2">Brands</option>
       </select>
       <button onclick="addCustomLink()">Add</button>
     </div>
 
     
-    <div id="statsPanel">
-      <h2>Statistiques du texte</h2>
-      <p><strong>Nombre total de liens :</strong> <span id="totalLinks">0</span></p>
-      <p><strong>Pourcentage de texte enrichi :</strong> <span id="enrichedPercent">0%</span></p>
-      <p><strong>Nombre de doublons :</strong> <span id="duplicateLinks">0</span></p>
-      <p><strong>Nombre de liens par catégorie :</strong></p>
-      <ul>
-        <li>Priorité 1 : <span id="cat1">0</span></li>
-        <li>Priorité 2 : <span id="cat2">0</span></li>
-        <li>Priorité 3 : <span id="cat3">0</span></li>
-      </ul>
-    </div>
+  
 
 
     <div class="link-manager" id="linkManager" style="display: none">
