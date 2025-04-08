@@ -85,6 +85,7 @@
       transition: background 0.3s;
     }
 
+
     button:hover {
       background: #ffe3f0;
     }
@@ -172,6 +173,21 @@
       <button onclick="addCustomLink()">Add</button>
     </div>
 
+    
+    <div id="statsPanel">
+      <h2>Statistiques du texte</h2>
+      <p><strong>Nombre total de liens :</strong> <span id="totalLinks">0</span></p>
+      <p><strong>Pourcentage de texte enrichi :</strong> <span id="enrichedPercent">0%</span></p>
+      <p><strong>Nombre de doublons :</strong> <span id="duplicateLinks">0</span></p>
+      <p><strong>Nombre de liens par catégorie :</strong></p>
+      <ul>
+        <li>Priorité 1 : <span id="cat1">0</span></li>
+        <li>Priorité 2 : <span id="cat2">0</span></li>
+        <li>Priorité 3 : <span id="cat3">0</span></li>
+      </ul>
+    </div>
+
+
     <div class="link-manager" id="linkManager" style="display: none">
       <h2>Custom Links</h2>
       <div id="linkList"></div>
@@ -181,6 +197,20 @@
   <script>
     function escapeRegExp(string) {
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+    
+    function updateStats(text, linkCountMap, totalLength, priorityCounts) {
+      const totalLinks = Object.values(linkCountMap).reduce((a, b) => a + b, 0);
+      const uniqueLinks = Object.keys(linkCountMap).length;
+      const duplicates = totalLinks - uniqueLinks;
+    
+      document.getElementById("totalLinks").textContent = totalLinks;
+      document.getElementById("duplicateLinks").textContent = duplicates;
+      document.getElementById("enrichedPercent").textContent = ((text.length / totalLength) * 100).toFixed(1) + "%";
+    
+      document.getElementById("cat1").textContent = priorityCounts[0];
+      document.getElementById("cat2").textContent = priorityCounts[1];
+      document.getElementById("cat3").textContent = priorityCounts[2];
     }
 
     function getSavedLinks() {
@@ -211,6 +241,7 @@
       const priorityLinks = defaultLinks.map((group, i) => ({ ...group, ...customLinks[i] }));
 
       let text = document.getElementById("inputText").value;
+      updateStats(text, linkCountMap, originalText.length, priorityCounts);
       const placeholders = [];
       let index = 0;
 
