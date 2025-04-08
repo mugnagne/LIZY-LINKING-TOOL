@@ -153,18 +153,27 @@
 
   <main>
     <div class="container">
-      <textarea id="inputText" placeholder="Paste your text here..."></textarea>
-      <div id="previewArea"></div>
-    </div>
-    <div>
-      <button onclick="convertText()">Add links</button>
-      <button onclick="toggleLinkManager()">Show / Hide link inventory</button>
-    </div>
+  <textarea id="inputText" placeholder="Paste your text here"></textarea>
+  <div id="previewArea"></div>
+  <div id="statsPanel">
+    <h2>Statistiques du texte</h2>
+    <p><strong>Nombre total de liens :</strong> <span id="totalLinks">0</span></p>
+    <p><strong>Pourcentage de texte enrichi :</strong> <span id="enrichedPercent">0%</span></p>
+    <p><strong>Nombre de doublons :</strong> <span id="duplicateLinks">0</span></p>
+    <p><strong>Nombre de liens par catégorie :</strong></p>
+    <ul>
+      <li>Priorité 1 : <span id="cat1">0</span></li>
+      <li>Priorité 2 : <span id="cat2">0</span></li>
+      <li>Priorité 3 : <span id="cat3">0</span></li>
+    </ul>
+  </div>
+</div>
+
 
     <div class="form-section">
       <h2>Add a new keyword</h2>
-      <input type="text" id="customWord" placeholder="Mot ou expression (ex: Tesla Model Y)">
-      <input type="text" id="customURL" placeholder="URL (ex: https://fr.wikipedia.org/wiki/Tesla_Model_Y)">
+      <input type="text" id="customWord" placeholder="Keyword (ex: Tesla Model Y)">
+      <input type="text" id="customURL" placeholder="URL (ex: https://en.wikipedia.org/wiki/Tesla_Model_Y)">
       <select id="customPriority">
         <option value="0">Priority 1</option>
         <option value="1">Priority 2</option>
@@ -284,7 +293,7 @@
       savedLinks[priority][word] = url;
       saveLinks(savedLinks);
 
-      alert(`Mot-clé "${word}" ajouté avec succès.`);
+      alert(`Keyword "${word}" added`);
       document.getElementById("customWord").value = "";
       document.getElementById("customURL").value = "";
       document.getElementById("customPriority").value = "0";
