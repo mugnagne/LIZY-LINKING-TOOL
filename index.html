@@ -239,48 +239,59 @@
     }
 
     function convertText() {
-      const defaultLinks = [
-        {
-          "Tesla Model 3": "https://fr.wikipedia.org/wiki/Tesla_Model_3"
-        },
-        {
-          "Chine": "https://fr.wikipedia.org/wiki/Chine"
-        },
-        {
-          "Tesla": "https://fr.wikipedia.org/wiki/Tesla,_Inc.",
-          "BMW": "https://fr.wikipedia.org/wiki/BMW",
-          "Volkswagen": "https://fr.wikipedia.org/wiki/Volkswagen"
-        }
-      ];
-
-      const customLinks = getSavedLinks();
-      const priorityLinks = defaultLinks.map((group, i) => ({ ...group, ...customLinks[i] }));
-
-      let text = document.getElementById("inputText").value;
-      updateStats(text, linkCountMap, originalText.length, priorityCounts);
-      const placeholders = [];
-      let index = 0;
-
-      for (const level of priorityLinks) {
-        for (const word in level) {
-          const url = level[word];
-          const escaped = escapeRegExp(word);
-          const regex = new RegExp(escaped, 'gi');
-          text = text.replace(regex, match => {
-            const placeholder = `@@@${index}@@@`;
-            placeholders.push({ placeholder, html: `<a href="${url}" target="_blank" style="color: #FF007A; text-decoration: underline;">${match}</a>` });
-            index++;
-            return placeholder;
-          });
-        }
-      }
-
-      for (const item of placeholders) {
-        text = text.replace(item.placeholder, item.html);
-      }
-
-      document.getElementById("previewArea").innerHTML = text;
+  const defaultLinks = [
+    {
+      "Tesla Model 3": "https://fr.wikipedia.org/wiki/Tesla_Model_3"
+    },
+    {
+      "Chine": "https://fr.wikipedia.org/wiki/Chine"
+    },
+    {
+      "Tesla": "https://fr.wikipedia.org/wiki/Tesla,_Inc.",
+      "BMW": "https://fr.wikipedia.org/wiki/BMW",
+      "Volkswagen": "https://fr.wikipedia.org/wiki/Volkswagen"
     }
+  ];
+
+  const customLinks = getSavedLinks();
+  const priorityLinks = defaultLinks.map((group, i) => ({ ...group, ...customLinks[i] }));
+
+  let originalText = document.getElementById("inputText").value;
+  let text = originalText;
+  const placeholders = [];
+  let index = 0;
+  const linkCountMap = {};
+  const priorityCounts = [0, 0, 0];
+
+  for (let i = 0; i < priorityLinks.length; i++) {
+    const level = priorityLinks[i];
+    for (const word in level) {
+      const url = level[word];
+      const escaped = escapeRegExp(word);
+      const regex = new RegExp(escaped, 'gi');
+      text = text.replace(regex, match => {
+        const placeholder = `@@@${index}@@@`;
+        placeholders.push({
+          placeholder,
+          html: `<a href="${url}" target="_blank" style="color: #FF007A; text-decoration: underline;">${match}</a>`
+        });
+        linkCountMap[url] = (linkCountMap[url] || 0) + 1;
+        priorityCounts[i]++;
+        index++;
+        return placeholder;
+      });
+    }
+  }
+
+  for (const item of placeholders) {
+    text = text.replace(item.placeholder, item.html);
+  }
+
+  document.getElementById("previewArea").innerHTML = text;
+
+  // ✅ Déplace l'appel ici à la toute fin
+  updateStats(text, linkCountMap, originalText.length, priorityCounts);
+}
 
     function addCustomLink() {
       const word = document.getElementById("customWord").value.trim();
