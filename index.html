@@ -152,28 +152,28 @@
 
   <main>
     <div class="container">
-      <textarea id="inputText" placeholder="Colle ton texte ici..."></textarea>
+      <textarea id="inputText" placeholder="Paste your text here..."></textarea>
       <div id="previewArea"></div>
     </div>
     <div>
-      <button onclick="convertText()">Ajouter les liens</button>
-      <button onclick="toggleLinkManager()">Afficher / Masquer les liens</button>
+      <button onclick="convertText()">Add links</button>
+      <button onclick="toggleLinkManager()">Show / Hide link inventory</button>
     </div>
 
     <div class="form-section">
-      <h2>Ajouter un mot-clé personnalisé</h2>
+      <h2>Add a new keyword</h2>
       <input type="text" id="customWord" placeholder="Mot ou expression (ex: Tesla Model Y)">
       <input type="text" id="customURL" placeholder="URL (ex: https://fr.wikipedia.org/wiki/Tesla_Model_Y)">
       <select id="customPriority">
-        <option value="0">Priorité 1 - Modèles précis</option>
-        <option value="1">Priorité 2 - Généralités</option>
-        <option value="2">Priorité 3 - Marques</option>
+        <option value="0">Priority 1</option>
+        <option value="1">Priority 2</option>
+        <option value="2">Priority 3</option>
       </select>
-      <button onclick="addCustomLink()">Ajouter</button>
+      <button onclick="addCustomLink()">Add</button>
     </div>
 
     <div class="link-manager" id="linkManager" style="display: none">
-      <h2>Liens personnalisés enregistrés</h2>
+      <h2>Custom Links</h2>
       <div id="linkList"></div>
     </div>
   </main>
