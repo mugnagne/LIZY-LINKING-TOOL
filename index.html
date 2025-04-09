@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -89,7 +90,7 @@
 <body>
   <header>
     <img src="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" alt="Logo LIZY">
-    <h1>LIZY Auto-Linker 2.0</h1>
+    <h1>LIZY Auto-Linker 2.1</h1>
   </header>
 
   <main>
@@ -230,7 +231,9 @@
     return text;
   }
 
-  document.getElementById("csvFile").addEventListener("change", handleCSVUpload);
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("csvFile").addEventListener("change", handleCSVUpload);
+  });
 </script>
 
 </body>
