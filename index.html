@@ -177,6 +177,9 @@
     <div class="container">
   <textarea id="inputText" placeholder="Paste your text here"></textarea>
   <div id="previewArea"></div>
+  <button onclick="copyHTML()">📋 Copier le HTML enrichi</button>
+  <div id="copyFeedback" style="text-align:center; color:green; font-weight:bold; margin-top:10px;"></div>
+
   <div id="statsPanel">
     <h2>📊 Statistiques du texte</h2>
     <p><strong>🔗 Number of links:</strong> <span id="totalLinks">0</span></p>
@@ -206,6 +209,7 @@
         <option value="2">Brands</option>
       </select>
       <button onclick="addCustomLink()">Add</button>
+      <div id="feedback" style="text-align:center; font-weight:bold; color:green; margin-top:10px;"></div>
     </div>
 
     
@@ -318,7 +322,7 @@
       const priority = parseInt(document.getElementById("customPriority").value);
 
       if (!word || !url) {
-        alert("Merci de remplir tous les champs.");
+        alert("❌ Please fill every field");
         return;
       }
 
@@ -330,7 +334,8 @@
       savedLinks[priority][word] = url;
       saveLinks(savedLinks);
 
-      alert(`Keyword "${word}" added`);
+      document.getElementById("feedback").textContent = `✅ Keyword "${word}" added!`;
+      setTimeout(() => document.getElementById("feedback").textContent = '', 3000);
       document.getElementById("customWord").value = "";
       document.getElementById("customURL").value = "";
       document.getElementById("customPriority").value = "0";
@@ -454,6 +459,7 @@ function enrichCSVArticleColumn() {
 
     const csvContent = enrichedRows.map(r => r.join(',')).join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
+    document.querySelectorAll('#csvStatus a').forEach(a => a.remove());
     const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
     downloadLink.download = 'enriched_articles.csv';
@@ -463,7 +469,15 @@ function enrichCSVArticleColumn() {
   };
   reader.readAsText(file);
 }
-
+function copyHTML() {
+  const html = document.getElementById("previewArea").innerHTML;
+  navigator.clipboard.writeText(html).then(() => {
+    document.getElementById("copyFeedback").textContent = "✅ HTML copied to clipboard!";
+    setTimeout(() => document.getElementById("copyFeedback").textContent = '', 3000);
+  }).catch(() => {
+    document.getElementById("copyFeedback").textContent = "❌ Failed to copy.";
+  });
+}
 </script>
 </body>
 </html>
