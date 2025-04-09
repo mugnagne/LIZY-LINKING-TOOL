@@ -176,10 +176,9 @@
   <main>
     <div class="container">
   <textarea id="inputText" placeholder="Paste your text here"></textarea>
-  <div id="previewArea"></div>
-  <button onclick="copyHTML()">📋 Copier le HTML enrichi</button>
-  <div id="copyFeedback" style="text-align:center; color:green; font-weight:bold; margin-top:10px;"></div>
-
+  $1
+<button onclick="copyHTML()">📋 Copier le HTML enrichi</button>
+<div id="copyFeedback" style="text-align:center; color:green; font-weight:bold; margin-top:10px;"></div>
   <div id="statsPanel">
     <h2>📊 Statistiques du texte</h2>
     <p><strong>🔗 Number of links:</strong> <span id="totalLinks">0</span></p>
@@ -193,10 +192,12 @@
     </ul>
   </div>
   </div>
-    <div>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
   <button onclick="convertText()">Ajouter les liens</button>
   <button onclick="toggleLinkManager()">Afficher / Masquer les liens ajoutés</button>
-    </div>
+  <button onclick="copyHTML()">📋 Copier le HTML enrichi</button>
+</div>
+<div id="copyFeedback" style="text-align:center; color:green; font-weight:bold; opacity: 0; transition: opacity 0.5s;"></div>
 
 
     <div class="form-section">
@@ -209,22 +210,18 @@
         <option value="2">Brands</option>
       </select>
       <button onclick="addCustomLink()">Add</button>
-      <div id="feedback" style="text-align:center; font-weight:bold; color:green; margin-top:10px;"></div>
-    </div>
+    <div id="feedback" style="text-align:center; font-weight:bold; color:green; margin-top:10px;"></div>
 
-    
-  
-
-
-    <div class="link-manager" id="linkManager" style="display: none">
+<div class="link-manager" id="linkManager" style="display: none">
       <h2>Custom Links</h2>
       <div id="linkList"></div>
     </div>
       <div class="form-section">
       <h2>Upload CSV</h2>
       <button onclick="document.getElementById('csvFile').click()">Upload a CSV file</button>
-      <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="handleCSVUpload(event)">
+      $1
       <div id="csvStatus" style="margin-top: 10px; font-weight: bold;"></div>
+    
       <button onclick="enrichCSVArticleColumn()">Enrich Text</button>
     </div>
   </main>
@@ -322,7 +319,7 @@
       const priority = parseInt(document.getElementById("customPriority").value);
 
       if (!word || !url) {
-        alert("❌ Please fill every field");
+        alert("Merci de remplir tous les champs.");
         return;
       }
 
@@ -335,7 +332,7 @@
       saveLinks(savedLinks);
 
       document.getElementById("feedback").textContent = `✅ Keyword "${word}" added!`;
-      setTimeout(() => document.getElementById("feedback").textContent = '', 3000);
+setTimeout(() => document.getElementById("feedback").textContent = '', 3000);
       document.getElementById("customWord").value = "";
       document.getElementById("customURL").value = "";
       document.getElementById("customPriority").value = "0";
@@ -459,7 +456,6 @@ function enrichCSVArticleColumn() {
 
     const csvContent = enrichedRows.map(r => r.join(',')).join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
-    document.querySelectorAll('#csvStatus a').forEach(a => a.remove());
     const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
     downloadLink.download = 'enriched_articles.csv';
@@ -469,15 +465,29 @@ function enrichCSVArticleColumn() {
   };
   reader.readAsText(file);
 }
+
+
 function copyHTML() {
   const html = document.getElementById("previewArea").innerHTML;
   navigator.clipboard.writeText(html).then(() => {
-    document.getElementById("copyFeedback").textContent = "✅ HTML copied to clipboard!";
-    setTimeout(() => document.getElementById("copyFeedback").textContent = '', 3000);
+    const feedback = document.getElementById("copyFeedback");
+    feedback.textContent = "✅ HTML copied to clipboard!";
+    feedback.style.opacity = "1";
+    setTimeout(() => {
+      feedback.style.opacity = "0";
+    }, 2500);
   }).catch(() => {
+    const feedback = document.getElementById("copyFeedback");
+    feedback.textContent = "❌ Failed to copy.";
+    feedback.style.opacity = "1";
+    setTimeout(() => {
+      feedback.style.opacity = "0";
+    }, 2500);
+  });
+}).catch(() => {
     document.getElementById("copyFeedback").textContent = "❌ Failed to copy.";
   });
 }
-</script>
-</body>
+
+$1
 </html>
