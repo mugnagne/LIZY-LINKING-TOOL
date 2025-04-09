@@ -223,7 +223,10 @@
     
       document.getElementById("totalLinks").textContent = totalLinks;
       document.getElementById("duplicateLinks").textContent = duplicates;
-      document.getElementById("enrichedPercent").textContent = ((text.length / totalLength) * 100).toFixed(1) + "%";
+      const totalWords = totalLength.trim().split(/\s+/).length;
+      const enrichedWords = Object.values(linkCountMap).reduce((a, b) => a + b, 0);
+      document.getElementById("enrichedPercent").textContent = ((enrichedWords / totalWords) * 100).toFixed(1) + "%";
+
     
       document.getElementById("cat1").textContent = priorityCounts[0];
       document.getElementById("cat2").textContent = priorityCounts[1];
