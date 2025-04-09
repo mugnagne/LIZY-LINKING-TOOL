@@ -176,9 +176,8 @@
   <main>
     <div class="container">
   <textarea id="inputText" placeholder="Paste your text here"></textarea>
-  
-
-  <div id="statsPanel">
+<div id="previewArea"></div>
+<div id="statsPanel">
     <h2>📊 Statistiques du texte</h2>
     <p><strong>🔗 Number of links:</strong> <span id="totalLinks">0</span></p>
     <p><strong>📈 Link %:</strong> <span id="enrichedPercent">0%</span></p>
@@ -191,7 +190,7 @@
     </ul>
   </div>
   </div>
-    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; align-items: center;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; align-items: center; margin-top: 20px;">
   <button onclick="convertText()">Ajouter les liens</button>
   <button onclick="toggleLinkManager()">Afficher / Masquer les liens ajoutés</button>
   <button onclick="copyHTML()">📋 Copier le HTML enrichi</button>
