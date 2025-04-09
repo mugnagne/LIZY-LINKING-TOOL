@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>LIZY Auto-Linker 1.1</title>
+  <title>LIZY Auto-Linker 1.2</title>
   <link rel="icon" href="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -75,19 +75,23 @@
     }
 
     #statsPanel {
-      max-width: 320px;
-      background: #fff;
-      color: #000;
-      border-radius: 10px;
-      padding: 15px;
-      font-size: 15px;
-    }
+  max-width: 320px;
+  background: #fff;
+  color: #000;
+  border-radius: 10px;
+  padding: 20px;
+  font-size: 15px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
 
     #statsPanel h2 {
-      margin-top: 0;
-      font-size: 18px;
-      color: #FF007A;
-    }
+  margin-top: 0;
+  font-size: 18px;
+  color: #FF007A;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
     button {
       background: #fff;
@@ -174,15 +178,15 @@
   <textarea id="inputText" placeholder="Paste your text here"></textarea>
   <div id="previewArea"></div>
   <div id="statsPanel">
-    <h2>Statistiques du texte</h2>
-    <p><strong>Number of links :</strong> <span id="totalLinks">0</span></p>
-    <p><strong>Link % :</strong> <span id="enrichedPercent">0%</span></p>
-    <p><strong>Double links :</strong> <span id="duplicateLinks">0</span></p>
-    <p><strong>Category repartition :</strong></p>
+    <h2>📊 Statistiques du texte</h2>
+    <p><strong>🔗 Number of links:</strong> <span id="totalLinks">0</span></p>
+    <p><strong>📈 Link %:</strong> <span id="enrichedPercent">0%</span></p>
+    <p><strong>♻️ Duplicate links:</strong> <span id="duplicateLinks">0</span></p>
+    <p><strong>📂 Category repartition:</strong></p>
     <ul>
-      <li>Articles : <span id="cat1">0</span></li>
-      <li>Models : <span id="cat2">0</span></li>
-      <li>Brands : <span id="cat3">0</span></li>
+      <li>📝 Articles: <span id="cat1">0</span></li>
+      <li>🚗 Models: <span id="cat2">0</span></li>
+      <li>🏷️ Brands: <span id="cat3">0</span></li>
     </ul>
   </div>
   </div>
