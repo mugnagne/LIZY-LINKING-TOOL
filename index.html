@@ -403,8 +403,7 @@ function enrichCSVArticleColumn() {
   const reader = new FileReader();
   reader.onload = function (e) {
     const text = e.target.result;
-    const rows = text.split('
-').map(r => r.split(','));
+    const rows = text.split('\n').map(r => r.split(','));
     const headers = rows[0];
     const articleIndex = headers.findIndex(h => h.trim().toLowerCase() === 'article');
 
@@ -466,6 +465,6 @@ function enrichCSVArticleColumn() {
   reader.readAsText(file);
 }
 
-$1
+
 </body>
 </html>
