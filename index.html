@@ -2,59 +2,192 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>LIZY Auto-Linker 1.5</title>
+  <title>LIZY Auto-Linker</title>
   <link rel="icon" href="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
-    body { font-family: 'Nunito', sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #FF007A, #FF5E3A); color: #fff; }
-    header { padding: 20px; display: flex; align-items: center; justify-content: center; }
-    header img { height: 50px; margin-right: 10px; }
-    h1 { font-size: 28px; margin: 0; }
-    main { display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
-    .container { display: flex; flex-wrap: wrap; gap: 20px; width: 100%; max-width: 1200px; }
-    textarea, #previewArea, #statsPanel { flex: 1; background: #fff; color: #000; padding: 15px; border-radius: 10px; font-size: 16px; border: none; }
-    textarea { height: 400px; resize: vertical; }
-    #previewArea { white-space: pre-wrap; overflow-y: auto; height: 400px; }
-    #statsPanel { max-width: 320px; }
-    .statsPanel h2, .form-section h2, .link-manager h2 { margin-top: 0; }
-    button { background: #fff; color: #FF007A; font-weight: bold; padding: 12px 24px; border: none; border-radius: 8px; margin: 10px; font-size: 16px; cursor: pointer; transition: background 0.3s; }
-    button:hover { background: #ffe3f0; }
-    .form-section, .link-manager { background: #fff; color: #000; border-radius: 12px; padding: 20px; width: 100%; max-width: 1000px; margin: 40px auto 0 auto; }
-    .form-section input, .form-section select { width: 80%; padding: 8px; margin: 10px auto; display: block; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; }
-    .link-manager table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    .link-manager th, .link-manager td { text-align: left; padding: 8px; border-bottom: 1px solid #ccc; }
-    .link-manager button { font-size: 12px; padding: 4px 8px; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #FF007A, #FF5E3A);
+      color: #fff;
+    }
+
+    header {
+      background: transparent;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    header img {
+      height: 50px;
+      margin-right: 10px;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      width: 100%;
+      max-width: 1200px;
+      flex-wrap: wrap;
+    }
+
+    textarea {
+      flex: 1;
+      height: 400px;
+      padding: 15px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+      resize: vertical;
+    }
+
+    #inputText {
+      background: #fff;
+      color: #333;
+    }
+
+    #previewArea {
+      white-space: pre-wrap;
+      flex: 1;
+      background: #fff;
+      color: #000;
+      padding: 15px;
+      border-radius: 10px;
+      height: 400px;
+      overflow-y: auto;
+    }
+
+    button {
+      background: #fff;
+      color: #FF007A;
+      font-weight: bold;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      margin: 20px 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+
+    button:hover {
+      background: #ffe3f0;
+    }
+
+    .form-section {
+      margin-top: 40px;
+      background: #fff;
+      color: #000;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .form-section h2 {
+      margin-top: 0;
+    }
+
+    .form-section input, 
+    .form-section select {
+      width: 80%;
+      padding: 8px;
+      margin: 10px auto;
+      display: block;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .link-manager {
+      background: #fff;
+      color: #000;
+      max-width: 600px;
+      width: 100%;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .link-manager h2 {
+      margin-top: 0;
+    }
+
+    .link-manager table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .link-manager th, .link-manager td {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .link-manager button {
+      margin: 0;
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+    .form-section {
+      margin-top: 40px;
+      background: #fff;
+      color: #000;
+      padding: 20px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
   </style>
 </head>
 <body>
   <header>
     <img src="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" alt="Logo LIZY">
-    <h1>LIZY Auto-Linker 1.5</h1>
+    <h1>LIZY Auto-Linker 1.3</h1>
   </header>
 
   <main>
     <div class="container">
-      <textarea id="inputText" placeholder="Paste your text here"></textarea>
-      <div id="previewArea"></div>
-      <div id="statsPanel">
-        <h2>Statistics</h2>
-        <p><strong>Number of links :</strong> <span id="totalLinks">0</span></p>
-        <p><strong>Link percentage :</strong> <span id="enrichedPercent">0%</span></p>
-        <p><strong>Double links :</strong> <span id="duplicateLinks">0</span></p>
-        <p><strong>Category repartition :</strong></p>
-        <ul>
-          <li>Articles : <span id="cat1">0</span></li>
-          <li>Models : <span id="cat2">0</span></li>
-          <li>Brands : <span id="cat3">0</span></li>
-        </ul>
-      </div>
+  <textarea id="inputText" placeholder="Paste your text here"></textarea>
+  <div id="previewArea"></div>
+  <div id="statsPanel">
+    <h2>Statistiques du texte</h2>
+    <p><strong>Number of links :</strong> <span id="totalLinks">0</span></p>
+    <p><strong>Link % :</strong> <span id="enrichedPercent">0%</span></p>
+    <p><strong>Double links :</strong> <span id="duplicateLinks">0</span></p>
+    <p><strong>Category repartition :</strong></p>
+    <ul>
+      <li>Articles : <span id="cat1">0</span></li>
+      <li>Models : <span id="cat2">0</span></li>
+      <li>Brands : <span id="cat3">0</span></li>
+    </ul>
+  </div>
+  </div>
+    <div>
+  <button onclick="convertText()">Ajouter les liens</button>
+  <button onclick="toggleLinkManager()">Afficher / Masquer les liens ajoutés</button>
     </div>
 
-    <div>
-      <button onclick="convertText()">Add your links</button>
-      <button onclick="toggleLinkManager()">Show / Hide links inventory panel</button>
-    </div>
 
     <div class="form-section">
       <h2>Add a new keyword</h2>
@@ -68,6 +201,10 @@
       <button onclick="addCustomLink()">Add</button>
     </div>
 
+    
+  
+
+
     <div class="link-manager" id="linkManager" style="display: none">
       <h2>Custom Links</h2>
       <div id="linkList"></div>
@@ -75,10 +212,157 @@
   </main>
 
   <script>
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+    
+    function updateStats(text, linkCountMap, totalLength, priorityCounts) {
+      const totalLinks = Object.values(linkCountMap).reduce((a, b) => a + b, 0);
+      const uniqueLinks = Object.keys(linkCountMap).length;
+      const duplicates = totalLinks - uniqueLinks;
+    
+      document.getElementById("totalLinks").textContent = totalLinks;
+      document.getElementById("duplicateLinks").textContent = duplicates;
+      document.getElementById("enrichedPercent").textContent = ((text.length / totalLength) * 100).toFixed(1) + "%";
+    
+      document.getElementById("cat1").textContent = priorityCounts[0];
+      document.getElementById("cat2").textContent = priorityCounts[1];
+      document.getElementById("cat3").textContent = priorityCounts[2];
+    }
+
+    function getSavedLinks() {
+      const saved = localStorage.getItem("lizyLinks");
+      return saved ? JSON.parse(saved) : [{}, {}, {}];
+    }
+
+    function saveLinks(links) {
+      localStorage.setItem("lizyLinks", JSON.stringify(links));
+    }
+
     function convertText() {
-      const text = document.getElementById("inputText").value;
-      const enriched = enrichText(text);
-      document.getElementById("previewArea").innerHTML = enriched;
+  const defaultLinks = [
+    {
+      "Tesla Model 3": "https://fr.wikipedia.org/wiki/Tesla_Model_3"
+    },
+    {
+      "Chine": "https://fr.wikipedia.org/wiki/Chine"
+    },
+    {
+      "Tesla": "https://fr.wikipedia.org/wiki/Tesla,_Inc.",
+      "BMW": "https://fr.wikipedia.org/wiki/BMW",
+      "Volkswagen": "https://fr.wikipedia.org/wiki/Volkswagen"
+    }
+  ];
+
+  const customLinks = getSavedLinks();
+  const priorityLinks = defaultLinks.map((group, i) => ({ ...group, ...customLinks[i] }));
+
+  let originalText = document.getElementById("inputText").value;
+  let text = originalText;
+  const placeholders = [];
+  let index = 0;
+  const linkCountMap = {};
+  const priorityCounts = [0, 0, 0];
+
+  for (let i = 0; i < priorityLinks.length; i++) {
+    const level = priorityLinks[i];
+    for (const word in level) {
+      const url = level[word];
+      const escaped = escapeRegExp(word);
+      const regex = new RegExp(escaped, 'gi');
+      text = text.replace(regex, match => {
+        const placeholder = `@@@${index}@@@`;
+        placeholders.push({
+          placeholder,
+          html: `<a href="${url}" target="_blank" style="color: #FF007A; text-decoration: underline;">${match}</a>`
+        });
+        linkCountMap[url] = (linkCountMap[url] || 0) + 1;
+        priorityCounts[i]++;
+        index++;
+        return placeholder;
+      });
+    }
+  }
+
+  for (const item of placeholders) {
+    text = text.replace(item.placeholder, item.html);
+  }
+
+  document.getElementById("previewArea").innerHTML = text;
+
+  // ✅ Déplace l'appel ici à la toute fin
+  updateStats(text, linkCountMap, originalText.length, priorityCounts);
+}
+
+    function addCustomLink() {
+      const word = document.getElementById("customWord").value.trim();
+      let url = document.getElementById("customURL").value.trim();
+      const priority = parseInt(document.getElementById("customPriority").value);
+
+      if (!word || !url) {
+        alert("Merci de remplir tous les champs.");
+        return;
+      }
+
+      if (!/^https?:\/\//i.test(url)) {
+        url = "https://" + url;
+      }
+
+      const savedLinks = getSavedLinks();
+      savedLinks[priority][word] = url;
+      saveLinks(savedLinks);
+
+      alert(`Keyword "${word}" added`);
+      document.getElementById("customWord").value = "";
+      document.getElementById("customURL").value = "";
+      document.getElementById("customPriority").value = "0";
+
+      renderLinkList();
+    }
+
+    function deleteCustomLink(priority, word) {
+      const savedLinks = getSavedLinks();
+      delete savedLinks[priority][word];
+      saveLinks(savedLinks);
+      renderLinkList();
+    }
+
+    function renderLinkList() {
+      const savedLinks = getSavedLinks();
+      const listDiv = document.getElementById("linkList");
+      listDiv.innerHTML = "";
+
+      savedLinks.forEach((group, index) => {
+        const groupTitle = document.createElement("h3");
+        groupTitle.textContent = `Priorité ${index + 1}`;
+        listDiv.appendChild(groupTitle);
+
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        thead.innerHTML = "<tr><th>Mot-clé</th><th>URL</th><th></th></tr>";
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        for (const word in group) {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${word}</td>
+            <td><a href="${group[word]}" target="_blank">${group[word]}</a></td>
+            <td><button onclick="deleteCustomLink(${index}, '${word.replace(/'/g, "\\'")}')">Supprimer</button></td>
+          `;
+          tbody.appendChild(row);
+        }
+        table.appendChild(tbody);
+        listDiv.appendChild(table);
+      });
+    }
+
+    function toggleLinkManager() {
+      const section = document.getElementById("linkManager");
+      section.style.display = section.style.display === "none" ? "block" : "none";
+      if (section.style.display === "block") {
+        renderLinkList();
+      }
     }
   </script>
 </body>
