@@ -220,7 +220,7 @@
       <h2>Upload CSV</h2>
       <button onclick="document.getElementById('csvFile').click()">Upload a CSV file</button>
       <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="handleCSVUpload(event)">
-    
+      <div id="csvStatus" style="margin-top: 10px; font-weight: bold;"></div>
       <button onclick="enrichCSVArticleColumn()">Enrich Text</button>
     </div>
   </main>
