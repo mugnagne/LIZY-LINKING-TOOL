@@ -94,7 +94,7 @@
 <body>
   <header>
     <img src="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" alt="Logo LIZY">
-    <h1>LIZY Auto-Linker 2.3</h1>
+    <h1>LIZY Auto-Linker 2.31</h1>
   </header>
 
   <main>
@@ -196,9 +196,12 @@
         downloadBtn.href = url;
         downloadBtn.download = 'enriched_articles.csv';
         downloadBtn.textContent = 'Télécharger le CSV modifié';
-        downloadBtn.style = 'margin-top: 10px; display: inline-block; color: #FF007A; font-weight: bold;';
+        $1margin-top: 20px; display: block; background: #fff; color: #FF007A; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;$3
+        downloadBtn.className = 'download-button';
 
-        document.querySelector('.csv-interface').appendChild(downloadBtn);
+        document.getElementById("csvStatus").textContent = "✅ Fichier enrichi prêt au téléchargement";
+        document.getElementById("csvStatus").style.color = "#fff";
+        $1
 
         alert('✅ Le fichier a été enrichi avec succès. Cliquez sur le bouton pour le télécharger.');
       }
