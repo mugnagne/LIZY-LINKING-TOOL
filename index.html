@@ -6,10 +6,7 @@
   <link rel="icon" href="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       font-family: 'Nunito', sans-serif;
       margin: 0;
@@ -17,42 +14,29 @@
       background: linear-gradient(135deg, #FF007A, #FF5E3A);
       color: #fff;
     }
-
     header {
       padding: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-
-    header img {
-      height: 50px;
-      margin-right: 10px;
-    }
-
-    h1 {
-      font-size: 28px;
-      margin: 0;
-    }
-
-    main {
+    header img { height: 50px; margin-right: 10px; }
+    h1 { font-size: 28px; margin: 0; }
+    main { display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
+    .mode-toggle {
+      margin-bottom: 30px;
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 20px;
+      gap: 10px;
     }
-
-    .container {
-      display: flex;
+    .container, .csv-container {
+      display: none;
       flex-wrap: wrap;
       gap: 20px;
       width: 100%;
       max-width: 1200px;
     }
-
-    textarea,
-    #previewArea,
-    #statsPanel {
+    .active { display: flex !important; }
+    textarea, #previewArea, #statsPanel {
       flex: 1;
       background: #fff;
       color: #000;
@@ -61,47 +45,10 @@
       font-size: 16px;
       border: none;
     }
-
-    textarea {
-      height: 400px;
-      resize: vertical;
-    }
-
-    #previewArea {
-      white-space: pre-wrap;
-      overflow-y: auto;
-      height: 400px;
-    }
-
-    #statsPanel {
-      max-width: 320px;
-    }
-
-    .statsPanel h2,
-    .form-section h2,
-    .link-manager h2 {
-      margin-top: 0;
-    }
-
-    button {
-      background: #fff;
-      color: #FF007A;
-      font-weight: bold;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      margin: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background: #ffe3f0;
-    }
-
-    .form-section,
-    .link-manager {
+    textarea { height: 400px; resize: vertical; }
+    #previewArea { white-space: pre-wrap; overflow-y: auto; height: 400px; }
+    #statsPanel { max-width: 320px; }
+    .form-section, .link-manager {
       background: #fff;
       color: #000;
       border-radius: 12px;
@@ -110,45 +57,48 @@
       max-width: 1000px;
       margin: 40px auto 0 auto;
     }
-
-    .form-section input,
-    .form-section select {
-      width: 80%;
-      padding: 8px;
-      margin: 10px auto;
-      display: block;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 14px;
+    .form-section input, .form-section select {
+      width: 80%; padding: 8px; margin: 10px auto; display: block;
+      border-radius: 6px; border: 1px solid #ccc; font-size: 14px;
     }
-
-    .link-manager table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
+    button {
+      background: #fff; color: #FF007A; font-weight: bold;
+      padding: 12px 24px; border: none; border-radius: 8px;
+      margin: 10px; font-size: 16px; cursor: pointer;
+      transition: background 0.3s;
     }
-
-    .link-manager th,
-    .link-manager td {
-      text-align: left;
-      padding: 8px;
-      border-bottom: 1px solid #ccc;
+    button:hover { background: #ffe3f0; }
+    .link-manager table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .link-manager th, .link-manager td {
+      text-align: left; padding: 8px; border-bottom: 1px solid #ccc;
     }
-
-    .link-manager button {
-      font-size: 12px;
-      padding: 4px 8px;
+    .link-manager button { font-size: 12px; padding: 4px 8px; }
+    .csv-interface {
+      background: #fff;
+      color: #000;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 1000px;
+      margin: 20px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
   </style>
 </head>
 <body>
   <header>
     <img src="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" alt="Logo LIZY">
-    <h1>LIZY Auto-Linker 1.5 (% Update)</h1>
+    <h1>LIZY Auto-Linker 1.5</h1>
   </header>
 
   <main>
-    <div class="container">
+    <div class="mode-toggle">
+      <button onclick="switchMode('text')">📝 Mode texte</button>
+      <button onclick="switchMode('csv')">📁 Mode CSV</button>
+    </div>
+
+    <div class="container" id="textMode">
       <textarea id="inputText" placeholder="Paste your text here"></textarea>
       <div id="previewArea"></div>
       <div id="statsPanel">
@@ -165,12 +115,12 @@
       </div>
     </div>
 
-    <div>
+    <div id="textButtons">
       <button onclick="convertText()">Add your links</button>
       <button onclick="toggleLinkManager()">Show / Hide links inventory panel</button>
     </div>
 
-    <div class="form-section">
+    <div class="form-section" id="linkForm">
       <h2>Add a new keyword</h2>
       <input type="text" id="customWord" placeholder="Keyword (ex: Tesla Model Y)">
       <input type="text" id="customURL" placeholder="URL (ex: https://en.wikipedia.org/wiki/Tesla_Model_Y)">
@@ -185,6 +135,15 @@
     <div class="link-manager" id="linkManager" style="display: none">
       <h2>Custom Links</h2>
       <div id="linkList"></div>
+    </div>
+
+    <div class="csv-container" id="csvMode">
+      <div class="csv-interface">
+        <h2>CSV Upload Mode</h2>
+        <input type="file" id="csvFile" accept=".csv">
+        <p>Ce mode vous permettra bientôt de traiter automatiquement les colonnes texte d’un fichier CSV.</p>
+        <button disabled>Appliquer les liens (à venir)</button>
+      </div>
     </div>
   </main>
 
@@ -350,6 +309,15 @@
         renderLinkList();
       }
     }
+  function switchMode(mode) {
+      document.getElementById("textMode").classList.remove("active");
+      document.getElementById("csvMode").classList.remove("active");
+      document.getElementById("linkForm").style.display = mode === "text" ? "block" : "none";
+      document.getElementById("textButtons").style.display = mode === "text" ? "block" : "none";
+      document.getElementById(mode + "Mode").classList.add("active");
+    }
+
+    switchMode("text");
   </script>
 </body>
 </html>
