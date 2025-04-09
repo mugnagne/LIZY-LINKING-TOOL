@@ -164,7 +164,9 @@
     document.getElementById("textButtons").style.display = mode === "text" ? "block" : "none";
     document.getElementById(mode + "Mode").classList.add("active");
   }
-  switchMode("text");
+  document.addEventListener("DOMContentLoaded", () => {
+    switchMode("text");
+  });
 
   function handleCSVUpload(event) {
     const file = event.target.files[0];
@@ -196,14 +198,14 @@
         downloadBtn.href = url;
         downloadBtn.download = 'enriched_articles.csv';
         downloadBtn.textContent = 'Download enriched CSV';
-        document.querySelector('.csv-interface').appendChild(downloadBtn);wnloadBtn.style = 'margin-top: 20px; display: block; background: #fff; color: #FF007A; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;';
+        downloadBtn.style = 'margin-top: 20px; display: block; background: #fff; color: #FF007A; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;';
         downloadBtn.className = 'download-button';
 
         document.getElementById("csvStatus").textContent = "✅ Enriched file ready for download";
         document.getElementById("csvStatus").style.color = "#fff";
-        $1
+        document.querySelector('.csv-interface').appendChild(downloadBtn);
 
-        alert('alert('✅ File enriched successfully! Click the button to download it.');
+        alert('✅ File enriched successfully! Click the button to download it.');
       }
     });
   }
