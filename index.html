@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>LIZY Auto-Linker</title>
+  <title>LIZY Auto-Linker 1.1</title>
   <link rel="icon" href="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -74,6 +74,21 @@
       overflow-y: auto;
     }
 
+    #statsPanel {
+      max-width: 320px;
+      background: #fff;
+      color: #000;
+      border-radius: 10px;
+      padding: 15px;
+      font-size: 15px;
+    }
+
+    #statsPanel h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #FF007A;
+    }
+
     button {
       background: #fff;
       color: #FF007A;
@@ -86,7 +101,6 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-
 
     button:hover {
       background: #ffe3f0;
@@ -106,7 +120,7 @@
       margin-top: 0;
     }
 
-    .form-section input, 
+    .form-section input,
     .form-section select {
       width: 80%;
       padding: 8px;
@@ -146,17 +160,6 @@
       margin: 0;
       font-size: 12px;
       padding: 4px 8px;
-    }
-    .form-section {
-      margin-top: 40px;
-      background: #fff;
-      color: #000;
-      padding: 20px;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 1000px;
-      margin-left: auto;
-      margin-right: auto;
     }
   </style>
 </head>
@@ -216,18 +219,19 @@
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
     
-    function updateStats(text, linkCountMap, totalLength, priorityCounts) {
+   function updateStats(text, linkCountMap, totalText, priorityCounts) {
       const totalLinks = Object.values(linkCountMap).reduce((a, b) => a + b, 0);
       const uniqueLinks = Object.keys(linkCountMap).length;
       const duplicates = totalLinks - uniqueLinks;
-    
+
+      const totalWords = totalText.trim().split(/\s+/).length;
+      const enrichedWords = totalLinks; // totalLinks = nombre de mots liés
+      const linkPercentage = ((enrichedWords / totalWords) * 100).toFixed(1);
+
       document.getElementById("totalLinks").textContent = totalLinks;
       document.getElementById("duplicateLinks").textContent = duplicates;
-      const totalWords = totalLength.trim().split(/\s+/).length;
-      const enrichedWords = Object.values(linkCountMap).reduce((a, b) => a + b, 0);
-      document.getElementById("enrichedPercent").textContent = ((enrichedWords / totalWords) * 100).toFixed(1) + "%";
+      document.getElementById("enrichedPercent").textContent = `${linkPercentage}%`;
 
-    
       document.getElementById("cat1").textContent = priorityCounts[0];
       document.getElementById("cat2").textContent = priorityCounts[1];
       document.getElementById("cat3").textContent = priorityCounts[2];
