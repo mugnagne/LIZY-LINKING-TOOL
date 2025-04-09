@@ -220,7 +220,8 @@
       <h2>Upload CSV</h2>
       <button onclick="document.getElementById('csvFile').click()">Upload a CSV file</button>
       <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="handleCSVUpload(event)">
-      <div id="csvStatus" style="margin-top: 10px; font-weight: bold;"></div>
+      $1
+      <button onclick="enrichCSVArticleColumn()">Enrich Text</button>
     </div>
   </main>
 
@@ -391,6 +392,80 @@
     document.getElementById("csvStatus").style.color = "red";
   }
 }
-</script>
+function enrichCSVArticleColumn() {
+  const fileInput = document.getElementById('csvFile');
+  const file = fileInput.files[0];
+  if (!file) {
+    alert("❌ Please upload a CSV file first.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const text = e.target.result;
+    const rows = text.split('
+').map(r => r.split(','));
+    const headers = rows[0];
+    const articleIndex = headers.findIndex(h => h.trim().toLowerCase() === 'article');
+
+    if (articleIndex === -1) {
+      alert("❌ No 'Article' column found in the uploaded CSV.");
+      return;
+    }
+
+    const defaultLinks = [
+      { "Tesla Model 3": "https://fr.wikipedia.org/wiki/Tesla_Model_3" },
+      { "Chine": "https://fr.wikipedia.org/wiki/Chine" },
+      {
+        "Tesla": "https://fr.wikipedia.org/wiki/Tesla,_Inc.",
+        "BMW": "https://fr.wikipedia.org/wiki/BMW",
+        "Volkswagen": "https://fr.wikipedia.org/wiki/Volkswagen"
+      }
+    ];
+    const customLinks = getSavedLinks();
+    const priorityLinks = defaultLinks.map((group, i) => ({ ...group, ...customLinks[i] }));
+
+    const enrichedRows = rows.map((row, rowIndex) => {
+      if (rowIndex === 0) return row; // skip header
+      let cell = row[articleIndex];
+      if (!cell) return row;
+      const placeholders = [];
+      let index = 0;
+
+      for (const level of priorityLinks) {
+        for (const word in level) {
+          const url = level[word];
+          const regex = new RegExp(escapeRegExp(word), 'gi');
+          cell = cell.replace(regex, match => {
+            const placeholder = `@@@${index}@@@`;
+            placeholders.push({ placeholder, html: `<a href="${url}" target="_blank">${match}</a>` });
+            index++;
+            return placeholder;
+          });
+        }
+      }
+
+      for (const item of placeholders) {
+        cell = cell.replace(item.placeholder, item.html);
+      }
+
+      row[articleIndex] = cell;
+      return row;
+    });
+
+    const csvContent = enrichedRows.map(r => r.join(',')).join('
+');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = 'enriched_articles.csv';
+    downloadLink.textContent = 'Download enriched CSV';
+    downloadLink.style = 'margin-top: 10px; display: inline-block; color: #FF007A; font-weight: bold;';
+    document.getElementById('csvStatus').appendChild(downloadLink);
+  };
+  reader.readAsText(file);
+}
+
+$1
 </body>
 </html>
