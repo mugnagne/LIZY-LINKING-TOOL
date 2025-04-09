@@ -6,6 +6,10 @@
   <link rel="icon" href="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Nunito', sans-serif;
       margin: 0;
@@ -15,7 +19,6 @@
     }
 
     header {
-      background: transparent;
       padding: 20px;
       display: flex;
       align-items: center;
@@ -27,6 +30,11 @@
       margin-right: 10px;
     }
 
+    h1 {
+      font-size: 28px;
+      margin: 0;
+    }
+
     main {
       display: flex;
       flex-direction: column;
@@ -34,44 +42,45 @@
       padding: 40px 20px;
     }
 
-    h1 {
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
-
     .container {
       display: flex;
-      flex-direction: row;
+      flex-wrap: wrap;
       gap: 20px;
       width: 100%;
       max-width: 1200px;
-      flex-wrap: wrap;
     }
 
-    textarea {
-      flex: 1;
-      height: 400px;
-      padding: 15px;
-      border-radius: 10px;
-      border: none;
-      font-size: 16px;
-      resize: vertical;
-    }
-
-    #inputText {
-      background: #fff;
-      color: #333;
-    }
-
-    #previewArea {
-      white-space: pre-wrap;
+    textarea,
+    #previewArea,
+    #statsPanel {
       flex: 1;
       background: #fff;
       color: #000;
       padding: 15px;
       border-radius: 10px;
+      font-size: 16px;
+      border: none;
+    }
+
+    textarea {
       height: 400px;
+      resize: vertical;
+    }
+
+    #previewArea {
+      white-space: pre-wrap;
       overflow-y: auto;
+      height: 400px;
+    }
+
+    #statsPanel {
+      max-width: 320px;
+    }
+
+    .statsPanel h2,
+    .form-section h2,
+    .link-manager h2 {
+      margin-top: 0;
     }
 
     button {
@@ -81,32 +90,28 @@
       padding: 12px 24px;
       border: none;
       border-radius: 8px;
-      margin: 20px 10px;
+      margin: 10px;
       font-size: 16px;
       cursor: pointer;
       transition: background 0.3s;
     }
 
-
     button:hover {
       background: #ffe3f0;
     }
 
-    .form-section {
-      margin-top: 40px;
+    .form-section,
+    .link-manager {
       background: #fff;
       color: #000;
-      padding: 20px;
       border-radius: 12px;
-      max-width: 600px;
+      padding: 20px;
       width: 100%;
+      max-width: 1000px;
+      margin: 40px auto 0 auto;
     }
 
-    .form-section h2 {
-      margin-top: 0;
-    }
-
-    .form-section input, 
+    .form-section input,
     .form-section select {
       width: 80%;
       padding: 8px;
@@ -117,46 +122,22 @@
       font-size: 14px;
     }
 
-    .link-manager {
-      background: #fff;
-      color: #000;
-      max-width: 600px;
-      width: 100%;
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 20px;
-    }
-
-    .link-manager h2 {
-      margin-top: 0;
-    }
-
     .link-manager table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 10px;
     }
 
-    .link-manager th, .link-manager td {
+    .link-manager th,
+    .link-manager td {
       text-align: left;
       padding: 8px;
       border-bottom: 1px solid #ccc;
     }
 
     .link-manager button {
-      margin: 0;
       font-size: 12px;
       padding: 4px 8px;
-    }
-    .form-section {
-      margin-top: 40px;
-      background: #fff;
-      color: #000;
-      padding: 20px;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 1000px;
-      margin-left: auto;
-      margin-right: auto;
     }
   </style>
 </head>
@@ -168,26 +149,26 @@
 
   <main>
     <div class="container">
-  <textarea id="inputText" placeholder="Paste your text here"></textarea>
-  <div id="previewArea"></div>
-  <div id="statsPanel">
-    <h2>Statistiques du texte</h2>
-    <p><strong>Number of links :</strong> <span id="totalLinks">0</span></p>
-    <p><strong>Link % :</strong> <span id="enrichedPercent">0%</span></p>
-    <p><strong>Double links :</strong> <span id="duplicateLinks">0</span></p>
-    <p><strong>Category repartition :</strong></p>
-    <ul>
-      <li>Articles : <span id="cat1">0</span></li>
-      <li>Models : <span id="cat2">0</span></li>
-      <li>Brands : <span id="cat3">0</span></li>
-    </ul>
-  </div>
-  </div>
-    <div>
-  <button onclick="convertText()">Ajouter les liens</button>
-  <button onclick="toggleLinkManager()">Afficher / Masquer les liens ajoutés</button>
+      <textarea id="inputText" placeholder="Paste your text here"></textarea>
+      <div id="previewArea"></div>
+      <div id="statsPanel">
+        <h2>Statistiques du texte</h2>
+        <p><strong>Number of links :</strong> <span id="totalLinks">0</span></p>
+        <p><strong>Link % :</strong> <span id="enrichedPercent">0%</span></p>
+        <p><strong>Double links :</strong> <span id="duplicateLinks">0</span></p>
+        <p><strong>Category repartition :</strong></p>
+        <ul>
+          <li>Articles : <span id="cat1">0</span></li>
+          <li>Models : <span id="cat2">0</span></li>
+          <li>Brands : <span id="cat3">0</span></li>
+        </ul>
+      </div>
     </div>
 
+    <div>
+      <button onclick="convertText()">Ajouter les liens</button>
+      <button onclick="toggleLinkManager()">Afficher / Masquer les liens ajoutés</button>
+    </div>
 
     <div class="form-section">
       <h2>Add a new keyword</h2>
@@ -200,10 +181,6 @@
       </select>
       <button onclick="addCustomLink()">Add</button>
     </div>
-
-    
-  
-
 
     <div class="link-manager" id="linkManager" style="display: none">
       <h2>Custom Links</h2>
