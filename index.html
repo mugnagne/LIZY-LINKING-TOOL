@@ -176,9 +176,8 @@
   <main>
     <div class="container">
   <textarea id="inputText" placeholder="Paste your text here"></textarea>
-  $1
-<button onclick="copyHTML()">📋 Copier le HTML enrichi</button>
-<div id="copyFeedback" style="text-align:center; color:green; font-weight:bold; margin-top:10px;"></div>
+  
+
   <div id="statsPanel">
     <h2>📊 Statistiques du texte</h2>
     <p><strong>🔗 Number of links:</strong> <span id="totalLinks">0</span></p>
@@ -192,12 +191,12 @@
     </ul>
   </div>
   </div>
-    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; align-items: center;">
   <button onclick="convertText()">Ajouter les liens</button>
   <button onclick="toggleLinkManager()">Afficher / Masquer les liens ajoutés</button>
   <button onclick="copyHTML()">📋 Copier le HTML enrichi</button>
+  <span id="copyFeedback" style="color: green; font-weight: bold; opacity: 0; transition: opacity 0.5s;"></span>
 </div>
-<div id="copyFeedback" style="text-align:center; color:green; font-weight:bold; opacity: 0; transition: opacity 0.5s;"></div>
 
 
     <div class="form-section">
@@ -219,7 +218,6 @@
       <div class="form-section">
       <h2>Upload CSV</h2>
       <button onclick="document.getElementById('csvFile').click()">Upload a CSV file</button>
-      $1
       <div id="csvStatus" style="margin-top: 10px; font-weight: bold;"></div>
     
       <button onclick="enrichCSVArticleColumn()">Enrich Text</button>
@@ -338,7 +336,7 @@ setTimeout(() => document.getElementById("feedback").textContent = '', 3000);
       document.getElementById("customPriority").value = "0";
 
       renderLinkList();
-    }
+    } 
 
     function deleteCustomLink(priority, word) {
       const savedLinks = getSavedLinks();
@@ -484,10 +482,7 @@ function copyHTML() {
       feedback.style.opacity = "0";
     }, 2500);
   });
-}).catch(() => {
-    document.getElementById("copyFeedback").textContent = "❌ Failed to copy.";
-  });
 }
 
-$1
+</body>
 </html>
