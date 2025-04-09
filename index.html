@@ -90,7 +90,7 @@
 <body>
   <header>
     <img src="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" alt="Logo LIZY">
-    <h1>LIZY Auto-Linker 2.0</h1>
+    <h1>LIZY Auto-Linker 2.1</h1>
   </header>
 
   <main>
@@ -140,8 +140,12 @@
 
     <div class="csv-container" id="csvMode">
       <div class="csv-interface">
-        <h2>CSV Upload Mode</h2>
-        <input type="file" id="csvFile" accept=".csv">
+  <h2>📁 CSV Upload Mode</h2>
+  <p>Importez un fichier CSV contenant une ou plusieurs colonnes nommées <strong>"Article"</strong>. Les mots clés reconnus seront automatiquement enrichis avec les liens correspondants.</p>
+  <input type="file" id="csvFile" accept=".csv">
+  <button id="processCsvBtn" onclick="document.getElementById('csvFile').click()">Choisir un fichier CSV</button>
+  <div id="csvStatus" style="margin-top: 10px; font-weight: bold;"></div>
+  <div id="csvPreview" style="max-height: 300px; overflow-y: auto; margin-top: 20px;"></div>
         
       </div>
     </div>
