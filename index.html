@@ -194,7 +194,12 @@
   <button onclick="convertText()">Ajouter les liens</button>
   <button onclick="toggleLinkManager()">Afficher / Masquer les liens ajoutés</button>
   <button onclick="copyHTML()">📋 Copier le HTML enrichi</button>
+  <button onclick="enrichCSVWithGPT()">✨ Enrichir CSV avec GPT</button>
+ 
   <span id="copyFeedback" style="color: green; font-weight: bold; opacity: 0; transition: opacity 0.5s;"></span>
+</div>
+    <div style="margin-top: 10px; text-align: center;">
+  
 </div>
 
 
@@ -226,6 +231,9 @@
   </main>
 
   <script>
+    let originalCSVRows = null;
+let enrichedCSVRows = null;
+let articleColumnIndex = null;
     function escapeRegExp(string) {
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
@@ -413,25 +421,18 @@ function enrichCSVArticleColumn() {
       return;
     }
 
-    const defaultLinks = [
-      { "Tesla Model 3": "https://fr.wikipedia.org/wiki/Tesla_Model_3" },
-      { "Chine": "https://fr.wikipedia.org/wiki/Chine" },
-      {
-        "Tesla": "https://fr.wikipedia.org/wiki/Tesla,_Inc.",
-        "BMW": "https://fr.wikipedia.org/wiki/BMW",
-        "Volkswagen": "https://fr.wikipedia.org/wiki/Volkswagen"
-      }
-    ];
+    // Enrichissement
+    const defaultLinks = [...]; // ton tableau existant
     const customLinks = getSavedLinks();
     const priorityLinks = defaultLinks.map((group, i) => ({ ...group, ...customLinks[i] }));
 
-    const enrichedRows = rows.map((row, rowIndex) => {
-      if (rowIndex === 0) return row; // skip header
+    const enrichedRows = rows.map((row, i) => {
+      if (i === 0) return row;
       let cell = row[articleIndex];
       if (!cell) return row;
+
       const placeholders = [];
       let index = 0;
-
       for (const level of priorityLinks) {
         for (const word in level) {
           const url = level[word];
@@ -453,17 +454,28 @@ function enrichCSVArticleColumn() {
       return row;
     });
 
+    // 👉 Stockage global pour comparaison
+    originalCSVRows = rows;
+    enrichedCSVRows = enrichedRows;
+    articleColumnIndex = articleIndex;
+
+    // Affichage modal
+    showVerificationModal(originalCSVRows, enrichedCSVRows, articleColumnIndex);
+
+    // téléchargement
     const csvContent = enrichedRows.map(r => r.join(',')).join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
     downloadLink.download = 'enriched_articles.csv';
-    downloadLink.textContent = 'Download enriched CSV';
+    downloadLink.textContent = '⬇️ Download enriched CSV';
     downloadLink.style = 'margin-top: 10px; display: inline-block; color: #FF007A; font-weight: bold;';
     document.getElementById('csvStatus').appendChild(downloadLink);
   };
+
   reader.readAsText(file);
 }
+
 
 
 function copyHTML() {
@@ -484,6 +496,140 @@ function copyHTML() {
     }, 2500);
   });
 }
+    
+async function enrichCSVWithGPT() {
+  const fileInput = document.getElementById('csvFile');
+  const file = fileInput.files[0];
+  if (!file) {
+    alert("❌ Please upload a CSV file first.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = async function (e) {
+    const text = e.target.result;
+    const rows = text.split('\n').map(r => r.split(','));
+    const headers = rows[0];
+    const articleIndex = headers.findIndex(h => h.trim().toLowerCase() === 'article');
+    const idIndex = headers.findIndex(h => h.trim().toLowerCase() === 'id');
+    const titleIndex = headers.findIndex(h => h.trim().toLowerCase() === 'title');
+
+    if (articleIndex === -1) {
+      alert("❌ No 'Article' column found in the uploaded CSV.");
+      return;
+    }
+
+    const apiKey = prompt("Entrez votre clé API OpenAI (elle ne sera pas stockée)");
+
+    const enrichedRows = [headers];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      const content = row[articleIndex];
+      const title = row[titleIndex] || '';
+      const id = row[idIndex] || '';
+
+      if (!content) {
+        enrichedRows.push(row);
+        continue;
+      }
+
+      const prompt = `Voici un article :\n\n${content}\n\n, change la colonne "article" pour y mettre des mots au hasard parmis "Minecraft, Neuille, Theotim`;
+
+      try {
+        const completion = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: "gpt-4",
+            messages: [{ role: "user", content: prompt }],
+            temperature: 0.7
+          })
+        });
+
+        const result = await completion.json();
+        const enriched = result.choices?.[0]?.message?.content || content;
+        row[articleIndex] = enriched;
+      } catch (err) {
+        alert(`Erreur sur la ligne ${i} : ${err.message}`);
+      }
+
+      enrichedRows.push(row);
+    }
+
+    const csvContent = enrichedRows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = 'enriched_articles_gpt.csv';
+    downloadLink.textContent = '⬇️ Download enriched CSV (GPT)';
+    downloadLink.style = 'margin-top: 10px; display: inline-block; color: #FF007A; font-weight: bold;';
+    document.getElementById('csvStatus').appendChild(downloadLink);
+  };
+
+  reader.readAsText(file);
+}
+let originalCSVRows = null;
+let enrichedCSVRows = null;
+let articleColumnIndex = null;
+
+function showVerificationModal(originalRows, enrichedRows, articleIndex) {
+  originalCSVRows = originalRows;
+  enrichedCSVRows = enrichedRows;
+  articleColumnIndex = articleIndex;
+  openVerificationPopup();
+}
+
+function openVerificationPopup() {
+  const container = document.getElementById("comparisonContainer");
+  container.innerHTML = "";
+
+  if (!originalCSVRows || !enrichedCSVRows || articleColumnIndex === null) {
+    container.innerHTML = "<p>❌ Aucune donnée à comparer.</p>";
+  } else {
+    for (let i = 1; i < originalCSVRows.length; i++) {
+      const original = originalCSVRows[i][articleColumnIndex] || "";
+      const enriched = enrichedCSVRows[i][articleColumnIndex] || "";
+
+      if (original.trim() !== enriched.trim()) {
+        const block = document.createElement("div");
+        block.style.marginBottom = "30px";
+        block.innerHTML = `
+          <div style="background:#f6f6f6; border-radius:8px; padding:10px; margin-bottom:10px;">
+            <strong>📝 Avant :</strong><br>${escapeHTML(original)}
+          </div>
+          <div style="background:#e0ffe0; border-radius:8px; padding:10px;">
+            <strong>✨ Après :</strong><br>${enriched}
+          </div>
+          <hr style="margin:20px 0;">
+        `;
+        container.appendChild(block);
+      }
+    }
+  }
+
+  document.getElementById("verificationModal").style.display = "flex";
+}
+
+function closeVerificationPopup() {
+  document.getElementById("verificationModal").style.display = "none";
+}
+
+function escapeHTML(str) {
+  return str.replace(/[&<>'"]/g, tag => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[tag]));
+}
+
 </script>
+<div id="verificationModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color: rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:#fff; color:#000; padding:20px; border-radius:12px; max-width:90%; max-height:80%; overflow:auto; position:relative;">
+    <h2 style="margin-top:0;">Comparaison des articles</h2>
+    <div id="comparisonContainer"></div>
+    <button onclick="closeVerificationPopup()" style="position:absolute; top:10px; right:10px; background:red; color:#fff; border:none; border-radius:4px; padding:5px 10px;">Fermer</button>
+  </div>
+</div>
 </body>
 </html>
