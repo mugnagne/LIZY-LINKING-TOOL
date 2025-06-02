@@ -492,7 +492,7 @@ function copyHTML() {
   });
 }
     async function enrichCSVWithGPT() {
-  const key = document.getElementById("openaiKey").value.trim();
+const key = document.getElementById("openaiKey").value.replace(/[^\x20-\x7E]/g, '').trim();
   const fileInput = document.getElementById("csvFile");
   const file = fileInput.files[0];
   const status = document.getElementById("gptStatus");
