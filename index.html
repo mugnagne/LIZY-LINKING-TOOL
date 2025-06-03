@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>LIZY Auto-Linker 1.1</title>
+<meta charset="UTF-8">
+  <title>LIZY Auto-Linker 1.2</title>
   <link rel="icon" href="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -75,23 +74,23 @@
     }
 
     #statsPanel {
-  max-width: 320px;
-  background: #fff;
-  color: #000;
-  border-radius: 10px;
-  padding: 20px;
-  font-size: 15px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
+      max-width: 320px;
+      background: #fff;
+      color: #000;
+      border-radius: 10px;
+      padding: 20px;
+      font-size: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
 
     #statsPanel h2 {
-  margin-top: 0;
-  font-size: 18px;
-  color: #FF007A;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+      margin-top: 0;
+      font-size: 18px;
+      color: #FF007A;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
     button {
       background: #fff;
@@ -210,7 +209,13 @@
       <button onclick="addCustomLink()">Add</button>
     </div>
     <div id="feedback" style="text-align:center; font-weight:bold; color:green; margin-top:10px;"></div>
-
+    
+ <div class="form-section">
+    <h2>Importer base de données</h2>
+    <input type="file" id="bulkCsv" accept=".csv">
+    <button onclick="importCSVDatabase()">📁 Importer la base de données</button>
+  </div>
+    
 <div class="link-manager" id="linkManager" style="display: none">
       <h2>Custom Links</h2>
       <div id="linkList"></div>
@@ -484,6 +489,34 @@ function copyHTML() {
     }, 2500);
   });
 }
+    function importCSVDatabase() {
+      const fileInput = document.getElementById("bulkCsv");
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("❌ Aucun fichier sélectionné.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const lines = e.target.result.split('\n');
+        const savedLinks = getSavedLinks();
+
+        for (const line of lines) {
+          const [keyword, link, category] = line.split(',');
+          if (keyword && link && category) {
+            const catIndex = parseInt(category.trim());
+            if (catIndex >= 0 && catIndex < savedLinks.length) {
+              savedLinks[catIndex][keyword.trim()] = link.trim();
+            }
+          }
+        }
+
+        saveLinks(savedLinks);
+        alert("✅ Base de données importée !");
+      };
+      reader.readAsText(file);
+    }
 </script>
 </body>
 </html>
