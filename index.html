@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>LIZY Auto-Linker 1.1</title>
+  <title>LIZY Auto-Linker 1.2</title>
   <link rel="icon" href="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -524,14 +524,6 @@ const key = document.getElementById("openaiKey").value.replace(/[^\x20-\x7E]/g, 
           "Content-Type": "application/json",
           "Authorization": `Bearer ${key}`
         },
-        const result = await response.json();
-console.log("🧠 Réponse brute GPT :", result);
-
-const content = result?.choices?.[0]?.message?.content;
-
-if (!content) {
-  throw new Error("Réponse GPT vide ou mal formée.");
-}
         body: JSON.stringify({
            model: "gpt-3.5-turbo",
           messages: [{ role: "user", content: prompt }],
@@ -545,12 +537,7 @@ if (!content) {
       }
 
       const data = await response.json();
-      const content = data?.choices?.[0]?.message?.content;
-
-if (!content) {
-  console.error("🧨 Réponse reçue sans contenu CSV :", data);
-  throw new Error("Réponse GPT vide ou mal formée.");
-}
+      const content = data.choices[0].message.content;
 
       // Génération du lien de téléchargement
       const blob = new Blob([content], { type: "text/csv" });
@@ -606,12 +593,7 @@ if (!content) {
         });
 
         const data = await response.json();
-        const content = data?.choices?.[0]?.message?.content;
-
-if (!content) {
-  console.error("🧨 Réponse reçue sans contenu CSV :", data);
-  throw new Error("Réponse GPT vide ou mal formée.");
-}
+        const content = data.choices?.[0]?.message?.content;
 
         if (!content) {
           throw new Error("Réponse GPT vide ou mal formée.");
