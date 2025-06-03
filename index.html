@@ -593,42 +593,40 @@ const key = document.getElementById("openaiKey").value.replace(/[^\x20-\x7E]/g, 
 
 Réponds uniquement avec le CSV final, sans rien d'autre. Pas de texte d’introduction, pas de commentaires, pas de balise \`\`\`.
 
-${csvText};
+${csvText}`;
 
-      status.textContent = "⏳ Envoi à GPT via le Worker...";
+status.textContent = "⏳ Envoi à GPT via le Worker...";
 
-      try {
-        const response = await fetch("https://neuille.camille-1fe.workers.dev", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt })
-        });
+try {
+  const response = await fetch("https://neuille.camille-1fe.workers.dev", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ prompt })  // ✅ Bien placé ici
+  });
 
-        const data = await response.json();
-        const content = data.choices?.[0]?.message?.content;
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content;
 
-        if (!content) {
-          throw new Error("Réponse GPT vide ou mal formée.");
-        }
-
-        const blob = new Blob([content], { type: "text/csv" });
-        const downloadLink = document.createElement("a");
-        downloadLink.href = URL.createObjectURL(blob);
-        downloadLink.download = "csv_enrichi_gpt.csv";
-        downloadLink.textContent = "📥 Télécharger le fichier enrichi";
-        downloadLink.style = "margin-top: 10px; display: inline-block; color: #FF007A; font-weight: bold;";
-
-        status.innerHTML = "✅ Fichier enrichi avec GPT !<br/>";
-        status.style.color = "green";
-        status.appendChild(downloadLink);
-      } catch (err) {
-        status.textContent = "❌ Erreur : " + err.message;
-        status.style.color = "red";
-      }
-    };
-
-    reader.readAsText(file);
+  if (!content) {
+    throw new Error("Réponse GPT vide ou mal formée.");
   }
+
+  const blob = new Blob([content], { type: "text/csv" });
+  const downloadLink = document.createElement("a");
+  downloadLink.href = URL.createObjectURL(blob);
+  downloadLink.download = "csv_enrichi_gpt.csv";
+  downloadLink.textContent = "📥 Télécharger le fichier enrichi";
+  downloadLink.style = "margin-top: 10px; display: inline-block; color: #FF007A; font-weight: bold;";
+
+  status.innerHTML = "✅ Fichier enrichi avec GPT !<br/>";
+  status.style.color = "green";
+  status.appendChild(downloadLink);
+} catch (err) {
+  status.textContent = "❌ Erreur : " + err.message;
+  status.style.color = "red";
+}
 
 </script>
 </body>
