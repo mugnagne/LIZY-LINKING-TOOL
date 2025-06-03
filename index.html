@@ -524,6 +524,14 @@ const key = document.getElementById("openaiKey").value.replace(/[^\x20-\x7E]/g, 
           "Content-Type": "application/json",
           "Authorization": `Bearer ${key}`
         },
+        const result = await response.json();
+console.log("🧠 Réponse brute GPT :", result);
+
+const content = result?.choices?.[0]?.message?.content;
+
+if (!content) {
+  throw new Error("Réponse GPT vide ou mal formée.");
+}
         body: JSON.stringify({
            model: "gpt-3.5-turbo",
           messages: [{ role: "user", content: prompt }],
@@ -537,7 +545,12 @@ const key = document.getElementById("openaiKey").value.replace(/[^\x20-\x7E]/g, 
       }
 
       const data = await response.json();
-      const content = data.choices[0].message.content;
+      const content = data?.choices?.[0]?.message?.content;
+
+if (!content) {
+  console.error("🧨 Réponse reçue sans contenu CSV :", data);
+  throw new Error("Réponse GPT vide ou mal formée.");
+}
 
       // Génération du lien de téléchargement
       const blob = new Blob([content], { type: "text/csv" });
@@ -593,7 +606,12 @@ const key = document.getElementById("openaiKey").value.replace(/[^\x20-\x7E]/g, 
         });
 
         const data = await response.json();
-        const content = data.choices?.[0]?.message?.content;
+        const content = data?.choices?.[0]?.message?.content;
+
+if (!content) {
+  console.error("🧨 Réponse reçue sans contenu CSV :", data);
+  throw new Error("Réponse GPT vide ou mal formée.");
+}
 
         if (!content) {
           throw new Error("Réponse GPT vide ou mal formée.");
