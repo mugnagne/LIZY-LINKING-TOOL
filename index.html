@@ -164,6 +164,21 @@
       font-size: 12px;
       padding: 4px 8px;
     }
+      #importPreview {
+      margin-top: 10px;
+      background: #fff;
+      color: #000;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .keyword-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
   </style>
 </head>
 <body>
@@ -210,10 +225,11 @@
     </div>
     <div id="feedback" style="text-align:center; font-weight:bold; color:green; margin-top:10px;"></div>
     
- <div class="form-section">
+<div class="form-section">
     <h2>Importer base de données</h2>
     <input type="file" id="bulkCsv" accept=".csv">
     <button onclick="importCSVDatabase()">📁 Importer la base de données</button>
+    <div id="importPreview"></div>
   </div>
     
 <div class="link-manager" id="linkManager" style="display: none">
@@ -492,6 +508,9 @@ function copyHTML() {
     function importCSVDatabase() {
       const fileInput = document.getElementById("bulkCsv");
       const file = fileInput.files[0];
+      const preview = document.getElementById("importPreview");
+      preview.innerHTML = "";
+
       if (!file) {
         alert("❌ Aucun fichier sélectionné.");
         return;
@@ -508,6 +527,11 @@ function copyHTML() {
             const catIndex = parseInt(category.trim());
             if (catIndex >= 0 && catIndex < savedLinks.length) {
               savedLinks[catIndex][keyword.trim()] = link.trim();
+
+              const row = document.createElement("div");
+              row.className = "keyword-row";
+              row.innerHTML = `<span><strong>${keyword.trim()}</strong> → ${link.trim()} (cat. ${catIndex})</span> <button onclick="removeImportedKeyword(${catIndex}, '${keyword.trim()}')">❌</button>`;
+              preview.appendChild(row);
             }
           }
         }
@@ -516,6 +540,13 @@ function copyHTML() {
         alert("✅ Base de données importée !");
       };
       reader.readAsText(file);
+    }
+
+    function removeImportedKeyword(catIndex, keyword) {
+      const savedLinks = getSavedLinks();
+      delete savedLinks[catIndex][keyword];
+      saveLinks(savedLinks);
+      importCSVDatabase();
     }
 </script>
 </body>
