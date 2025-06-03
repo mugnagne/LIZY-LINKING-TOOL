@@ -170,7 +170,7 @@
 <body>
   <header>
     <img src="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" alt="Logo LIZY">
-    <h1>LIZY Auto-Linker 1.3</h1>
+    <h1>LIZY Auto-Linker 1.4</h1>
   </header>
 
   <main>
@@ -593,7 +593,7 @@ const key = document.getElementById("openaiKey").value.replace(/[^\x20-\x7E]/g, 
 
 Réponds uniquement avec le CSV final, sans rien d'autre. Pas de texte d’introduction, pas de commentaires, pas de balise \`\`\`.
 
-${text}`;
+${csvText};
 
       status.textContent = "⏳ Envoi à GPT via le Worker...";
 
