@@ -6,7 +6,7 @@
   <link rel="icon" href="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body {
+   body {
       font-family: 'Nunito', sans-serif;
       margin: 0;
       padding: 0;
@@ -80,6 +80,7 @@
       width: 80%;
       max-width: 600px;
       text-align: center;
+      touch-action: pan-y;
     }
 
     .cellContent {
@@ -97,32 +98,6 @@
       background: #e0ffe0;
       color: #333;
     }
-  </style>
-</head>
-<body>
-  <header>
-    <img src="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" alt="LIZY Logo">
-    <h1>LIZY Comparateur 🔀</h1>
-  </header>
-
-  <main>
-    <p>Comparez deux fichiers CSV et validez les modifications manuellement</p>
-
-    <input type="file" id="originalCSV" accept=".csv">
-    <input type="file" id="modifiedCSV" accept=".csv">
-    <button onclick="compareCSVs()">📊 Comparer les fichiers</button>
-    <div id="status"></div>
-  </main>
-
-  <div id="diffModal">
-    <div id="modalContent">
-      <h2>Validation d'une modification</h2>
-      <div id="originalDisplay" class="cellContent originalText"></div>
-      <div id="modifiedDisplay" class="cellContent modifiedText"></div>
-      <button onclick="validateChange(true)">✅ Accepter (Swipe droite)</button>
-      <button onclick="validateChange(false)">❌ Refuser (Swipe gauche)</button>
-    </div>
-  </div>
 
   <script>
     let differences = [];
@@ -247,6 +222,24 @@
       link.style = 'display:block;margin-top:20px;color:#fff;font-weight:bold;';
       document.querySelector('main').appendChild(link);
     }
+
+    let startX = null;
+    const modal = document.getElementById('modalContent');
+
+    modal.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+    });
+
+    modal.addEventListener('touchend', e => {
+      if (startX === null) return;
+      const endX = e.changedTouches[0].clientX;
+      const deltaX = endX - startX;
+
+      if (Math.abs(deltaX) > 50) {
+        validateChange(deltaX > 0); // droite = accepter, gauche = refuser
+      }
+      startX = null;
+    });
   </script>
 </body>
 </html>
