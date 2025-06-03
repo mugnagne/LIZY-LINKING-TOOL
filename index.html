@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>LIZY Auto-Linker 1.2</title>
+  <title>LIZY Auto-Linker 1.1</title>
   <link rel="icon" href="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -75,23 +75,23 @@
     }
 
     #statsPanel {
-      max-width: 320px;
-      background: #fff;
-      color: #000;
-      border-radius: 10px;
-      padding: 20px;
-      font-size: 15px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
+  max-width: 320px;
+  background: #fff;
+  color: #000;
+  border-radius: 10px;
+  padding: 20px;
+  font-size: 15px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
 
     #statsPanel h2 {
-      margin-top: 0;
-      font-size: 18px;
-      color: #FF007A;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+  margin-top: 0;
+  font-size: 18px;
+  color: #FF007A;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
     button {
       background: #fff;
@@ -168,42 +168,322 @@
   </style>
 </head>
 <body>
-  <!-- Contenu HTML existant -->
-  <div class="form-section">
-    <h2>Importer base de données</h2>
-    <input type="file" id="bulkCsv" accept=".csv">
-    <button onclick="importCSVDatabase()">📁 Importer la base de données</button>
+  <header>
+    <img src="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" alt="Logo LIZY">
+    <h1>LIZY Auto-Linker 1.3</h1>
+  </header>
+
+  <main>
+    <div class="container">
+  <textarea id="inputText" placeholder="Paste your text here"></textarea>
+<div id="previewArea"></div>
+<div id="statsPanel">
+    <h2>📊 Statistiques du texte</h2>
+    <p><strong>🔗 Number of links:</strong> <span id="totalLinks">0</span></p>
+    <p><strong>📈 Link %:</strong> <span id="enrichedPercent">0%</span></p>
+    <p><strong>♻️ Duplicate links:</strong> <span id="duplicateLinks">0</span></p>
+    <p><strong>📂 Category repartition:</strong></p>
+    <ul>
+      <li>📝 Articles: <span id="cat1">0</span></li>
+      <li>🚗 Models: <span id="cat2">0</span></li>
+      <li>🏷️ Brands: <span id="cat3">0</span></li>
+    </ul>
   </div>
+  </div>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; align-items: center; margin-top: 20px;">
+  <button onclick="convertText()">Ajouter les liens</button>
+  <button onclick="toggleLinkManager()">Afficher / Masquer les liens ajoutés</button>
+  <button onclick="copyHTML()">📋 Copier le HTML enrichi</button>
+  <span id="copyFeedback" style="color: green; font-weight: bold; opacity: 0; transition: opacity 0.5s;"></span>
+</div>
+
+
+    <div class="form-section">
+      <h2>Add a new keyword</h2>
+      <input type="text" id="customWord" placeholder="Keyword (ex: Tesla Model Y)">
+      <input type="text" id="customURL" placeholder="URL (ex: https://en.wikipedia.org/wiki/Tesla_Model_Y)">
+      <select id="customPriority">
+        <option value="0">Articles</option>
+        <option value="1">Models</option>
+        <option value="2">Brands</option>
+      </select>
+      <button onclick="addCustomLink()">Add</button>
+    </div>
+    <div id="feedback" style="text-align:center; font-weight:bold; color:green; margin-top:10px;"></div>
+
+<div class="link-manager" id="linkManager" style="display: none">
+      <h2>Custom Links</h2>
+      <div id="linkList"></div>
+    </div>
+      <div class="form-section">
+      <h2>Upload CSV</h2>
+      <button onclick="document.getElementById('csvFile').click()">Upload a CSV file</button>
+      <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="handleCSVUpload(event)">
+      <div id="csvStatus" style="margin-top: 10px; font-weight: bold;"></div>
+    
+      <button onclick="enrichCSVArticleColumn()">Enrich Text</button>
+    </div>
+  </main>
 
   <script>
-    function importCSVDatabase() {
-      const fileInput = document.getElementById("bulkCsv");
-      const file = fileInput.files[0];
-      if (!file) {
-        alert("❌ Aucun fichier sélectionné.");
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+    
+   function updateStats(text, linkCountMap, totalText, priorityCounts) {
+      const totalLinks = Object.values(linkCountMap).reduce((a, b) => a + b, 0);
+      const uniqueLinks = Object.keys(linkCountMap).length;
+      const duplicates = totalLinks - uniqueLinks;
+
+      const totalWords = totalText.trim().split(/\s+/).length;
+      const enrichedWords = totalLinks; // totalLinks = nombre de mots liés
+      const linkPercentage = ((enrichedWords / totalWords) * 100).toFixed(1);
+
+      document.getElementById("totalLinks").textContent = totalLinks;
+      document.getElementById("duplicateLinks").textContent = duplicates;
+      document.getElementById("enrichedPercent").textContent = `${linkPercentage}%`;
+
+      document.getElementById("cat1").textContent = priorityCounts[0];
+      document.getElementById("cat2").textContent = priorityCounts[1];
+      document.getElementById("cat3").textContent = priorityCounts[2];
+    }
+
+    function getSavedLinks() {
+      const saved = localStorage.getItem("lizyLinks");
+      return saved ? JSON.parse(saved) : [{}, {}, {}];
+    }
+
+    function saveLinks(links) {
+      localStorage.setItem("lizyLinks", JSON.stringify(links));
+    }
+
+    function convertText() {
+  const defaultLinks = [
+    {
+      "Tesla Model 3": "https://fr.wikipedia.org/wiki/Tesla_Model_3"
+    },
+    {
+      "Chine": "https://fr.wikipedia.org/wiki/Chine"
+    },
+    {
+      "Tesla": "https://fr.wikipedia.org/wiki/Tesla,_Inc.",
+      "BMW": "https://fr.wikipedia.org/wiki/BMW",
+      "Volkswagen": "https://fr.wikipedia.org/wiki/Volkswagen"
+    }
+  ];
+
+  const customLinks = getSavedLinks();
+  const priorityLinks = defaultLinks.map((group, i) => ({ ...group, ...customLinks[i] }));
+
+  let originalText = document.getElementById("inputText").value;
+  let text = originalText;
+  const placeholders = [];
+  let index = 0;
+  const linkCountMap = {};
+  const priorityCounts = [0, 0, 0];
+
+  for (let i = 0; i < priorityLinks.length; i++) {
+    const level = priorityLinks[i];
+    for (const word in level) {
+      const url = level[word];
+      const escaped = escapeRegExp(word);
+      const regex = new RegExp(escaped, 'gi');
+      text = text.replace(regex, match => {
+        const placeholder = `@@@${index}@@@`;
+        placeholders.push({
+          placeholder,
+          html: `<a href="${url}" target="_blank" style="color: #FF007A; text-decoration: underline;">${match}</a>`
+        });
+        linkCountMap[url] = (linkCountMap[url] || 0) + 1;
+        priorityCounts[i]++;
+        index++;
+        return placeholder;
+      });
+    }
+  }
+
+  for (const item of placeholders) {
+    text = text.replace(item.placeholder, item.html);
+  }
+
+  document.getElementById("previewArea").innerHTML = text;
+
+  // ✅ Déplace l'appel ici à la toute fin
+  updateStats(text, linkCountMap, originalText, priorityCounts);
+}
+
+    function addCustomLink() {
+      const word = document.getElementById("customWord").value.trim();
+      let url = document.getElementById("customURL").value.trim();
+      const priority = parseInt(document.getElementById("customPriority").value);
+
+      if (!word || !url) {
+        alert("Merci de remplir tous les champs.");
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const lines = e.target.result.split('\n');
-        const savedLinks = getSavedLinks();
+      if (!/^https?:\/\//i.test(url)) {
+        url = "https://" + url;
+      }
 
-        for (const line of lines) {
-          const [keyword, link, category] = line.split(',');
-          if (keyword && link && category) {
-            const catIndex = parseInt(category.trim());
-            if (catIndex >= 0 && catIndex < savedLinks.length) {
-              savedLinks[catIndex][keyword.trim()] = link.trim();
-            }
-          }
-        }
+      const savedLinks = getSavedLinks();
+      savedLinks[priority][word] = url;
+      saveLinks(savedLinks);
 
-        saveLinks(savedLinks);
-        alert("✅ Base de données importée !");
-      };
-      reader.readAsText(file);
+      document.getElementById("feedback").textContent = `✅ Keyword "${word}" added!`;
+setTimeout(() => document.getElementById("feedback").textContent = '', 3000);
+      document.getElementById("customWord").value = "";
+      document.getElementById("customURL").value = "";
+      document.getElementById("customPriority").value = "0";
+
+      renderLinkList();
+    } 
+
+    function deleteCustomLink(priority, word) {
+      const savedLinks = getSavedLinks();
+      delete savedLinks[priority][word];
+      saveLinks(savedLinks);
+      renderLinkList();
     }
-  </script>
+
+    function renderLinkList() {
+      const savedLinks = getSavedLinks();
+      const listDiv = document.getElementById("linkList");
+      listDiv.innerHTML = "";
+
+      savedLinks.forEach((group, index) => {
+        const groupTitle = document.createElement("h3");
+        groupTitle.textContent = `Priorité ${index + 1}`;
+        listDiv.appendChild(groupTitle);
+
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        thead.innerHTML = "<tr><th>Mot-clé</th><th>URL</th><th></th></tr>";
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        for (const word in group) {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${word}</td>
+            <td><a href="${group[word]}" target="_blank">${group[word]}</a></td>
+            <td><button onclick="deleteCustomLink(${index}, '${word.replace(/'/g, "\\'")}')">Supprimer</button></td>
+          `;
+          tbody.appendChild(row);
+        }
+        table.appendChild(tbody);
+        listDiv.appendChild(table);
+      });
+    }
+
+    function toggleLinkManager() {
+      const section = document.getElementById("linkManager");
+      section.style.display = section.style.display === "none" ? "block" : "none";
+      if (section.style.display === "block") {
+        renderLinkList();
+      }
+    }
+  function handleCSVUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    document.getElementById("csvStatus").textContent = `✔️ ${file.name} uploaded successfully.`;
+    document.getElementById("csvStatus").style.color = "green";
+  } else {
+    document.getElementById("csvStatus").textContent = "❌ No file selected.";
+    document.getElementById("csvStatus").style.color = "red";
+  }
+}
+function enrichCSVArticleColumn() {
+  const fileInput = document.getElementById('csvFile');
+  const file = fileInput.files[0];
+  if (!file) {
+    alert("❌ Please upload a CSV file first.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const text = e.target.result;
+    const rows = text.split('\n').map(r => r.split(','));
+    const headers = rows[0];
+    const articleIndex = headers.findIndex(h => h.trim().toLowerCase() === 'article');
+
+    if (articleIndex === -1) {
+      alert("❌ No 'Article' column found in the uploaded CSV.");
+      return;
+    }
+
+    const defaultLinks = [
+      { "Tesla Model 3": "https://fr.wikipedia.org/wiki/Tesla_Model_3" },
+      { "Chine": "https://fr.wikipedia.org/wiki/Chine" },
+      {
+        "Tesla": "https://fr.wikipedia.org/wiki/Tesla,_Inc.",
+        "BMW": "https://fr.wikipedia.org/wiki/BMW",
+        "Volkswagen": "https://fr.wikipedia.org/wiki/Volkswagen"
+      }
+    ];
+    const customLinks = getSavedLinks();
+    const priorityLinks = defaultLinks.map((group, i) => ({ ...group, ...customLinks[i] }));
+
+    const enrichedRows = rows.map((row, rowIndex) => {
+      if (rowIndex === 0) return row; // skip header
+      let cell = row[articleIndex];
+      if (!cell) return row;
+      const placeholders = [];
+      let index = 0;
+
+      for (const level of priorityLinks) {
+        for (const word in level) {
+          const url = level[word];
+          const regex = new RegExp(escapeRegExp(word), 'gi');
+          cell = cell.replace(regex, match => {
+            const placeholder = `@@@${index}@@@`;
+            placeholders.push({ placeholder, html: `<a href="${url}" target="_blank">${match}</a>` });
+            index++;
+            return placeholder;
+          });
+        }
+      }
+
+      for (const item of placeholders) {
+        cell = cell.replace(item.placeholder, item.html);
+      }
+
+      row[articleIndex] = cell;
+      return row;
+    });
+
+    const csvContent = enrichedRows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = 'enriched_articles.csv';
+    downloadLink.textContent = 'Download enriched CSV';
+    downloadLink.style = 'margin-top: 10px; display: inline-block; color: #FF007A; font-weight: bold;';
+    document.getElementById('csvStatus').appendChild(downloadLink);
+  };
+  reader.readAsText(file);
+}
+
+
+function copyHTML() {
+  const html = document.getElementById("previewArea").innerHTML;
+  navigator.clipboard.writeText(html).then(() => {
+    const feedback = document.getElementById("copyFeedback");
+    feedback.textContent = "✅ HTML copied to clipboard!";
+    feedback.style.opacity = "1";
+    setTimeout(() => {
+      feedback.style.opacity = "0";
+    }, 2500);
+  }).catch(() => {
+    const feedback = document.getElementById("copyFeedback");
+    feedback.textContent = "❌ Failed to copy.";
+    feedback.style.opacity = "1";
+    setTimeout(() => {
+      feedback.style.opacity = "0";
+    }, 2500);
+  });
+}
+</script>
 </body>
 </html>
