@@ -214,7 +214,7 @@
   <h2>Enrichissement avec ChatGPT</h2>
   <label for="openaiKey">🔑 Clé API OpenAI</label>
   <input type="password" id="openaiKey" placeholder="Ex: sk-..." style="width: 100%;">
-  <button onclick="enrichCSVWithGPT()">⚡ Enrichir le CSV avec ChatGPT</button>
+  <button onclick="enrichCSVWithGPTWorker()">⚡ Enrichir le CSV avec ChatGPT</button>
   <div id="gptStatus" style="margin-top: 10px; font-weight: bold;"></div>
 </div>
 
@@ -525,7 +525,7 @@ const key = document.getElementById("openaiKey").value.replace(/[^\x20-\x7E]/g, 
           "Authorization": `Bearer ${key}`
         },
         body: JSON.stringify({
-          model: "gpt-3.5-turbo",
+           model: "gpt-3.5-turbo",
           messages: [{ role: "user", content: prompt }],
           temperature: 0
         })
@@ -562,6 +562,61 @@ const key = document.getElementById("openaiKey").value.replace(/[^\x20-\x7E]/g, 
 
   reader.readAsText(file);
 }
+
+    
+  async function enrichCSVWithGPTWorker() {
+    const fileInput = document.getElementById('csvFile');
+    const file = fileInput.files[0];
+    const status = document.getElementById("gptStatus");
+
+    if (!file) {
+      status.textContent = "❌ Merci d'importer un fichier CSV.";
+      status.style.color = "red";
+      return;
+    }
+
+    status.textContent = "⏳ Lecture du fichier...";
+    const reader = new FileReader();
+
+    reader.onload = async function (e) {
+      const csvText = e.target.result;
+
+      const prompt = `Voici un fichier CSV. Remplace toutes les valeurs de la colonne "article" par le mot "Minecraft", sans toucher aux autres colonnes.\n\n${csvText}`;
+
+      status.textContent = "⏳ Envoi à GPT via le Worker...";
+
+      try {
+        const response = await fetch("https://neuille.camille-1fe.workers.dev", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
+        });
+
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content;
+
+        if (!content) {
+          throw new Error("Réponse GPT vide ou mal formée.");
+        }
+
+        const blob = new Blob([content], { type: "text/csv" });
+        const downloadLink = document.createElement("a");
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = "csv_enrichi_gpt.csv";
+        downloadLink.textContent = "📥 Télécharger le fichier enrichi";
+        downloadLink.style = "margin-top: 10px; display: inline-block; color: #FF007A; font-weight: bold;";
+
+        status.innerHTML = "✅ Fichier enrichi avec GPT !<br/>";
+        status.style.color = "green";
+        status.appendChild(downloadLink);
+      } catch (err) {
+        status.textContent = "❌ Erreur : " + err.message;
+        status.style.color = "red";
+      }
+    };
+
+    reader.readAsText(file);
+  }
 
 </script>
 </body>
