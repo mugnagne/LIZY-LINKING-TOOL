@@ -80,8 +80,7 @@
       width: 80%;
       max-width: 600px;
       text-align: center;
-      touch-action: pan-y;
-      transition: transform 0.3s ease;
+      position: relative;
     }
 
     .cellContent {
@@ -98,6 +97,34 @@
     .modifiedText {
       background: #e0ffe0;
       color: #333;
+    }
+
+    .emojiRain {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      animation: fall 1s linear;
+    }
+
+    @keyframes fall {
+      0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, 100%) scale(0.5); }
+    }
+
+    .actionButtons {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+
+    .actionButtons button {
+      font-size: 20px;
+      padding: 10px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
   </style>
 </head>
@@ -121,6 +148,10 @@
       <h2>Validation d'une modification</h2>
       <div id="originalDisplay" class="cellContent originalText"></div>
       <div id="modifiedDisplay" class="cellContent modifiedText"></div>
+      <div class="actionButtons">
+        <button onclick="validateChange(true)">⬅️<br>Validé</button>
+        <button onclick="validateChange(false)">➡️<br>Invalidé</button>
+      </div>
     </div>
   </div>
 
@@ -164,7 +195,6 @@
         row.push(current);
         rows.push(row);
       }
-
       return rows;
     }
 
@@ -179,7 +209,6 @@
       }
 
       status.textContent = '⏳ Lecture des fichiers...';
-
       const origText = await origFile.text();
       const modText = await modFile.text();
 
@@ -225,12 +254,24 @@
       document.getElementById('diffModal').style.display = 'flex';
     }
 
+    function showEmojiBurst(isAccepted) {
+      const modal = document.getElementById('modalContent');
+      for (let i = 0; i < 10; i++) {
+        const emoji = document.createElement('div');
+        emoji.className = 'emojiRain';
+        emoji.textContent = isAccepted ? '✅' : '❌';
+        emoji.style.left = Math.random() * 100 + '%';
+        modal.appendChild(emoji);
+        setTimeout(() => emoji.remove(), 1000);
+      }
+    }
+
     function validateChange(accepted) {
       const { i, j, orig, mod } = differences[currentIndex];
       mergedRows[i][j] = accepted ? mod : orig;
+      showEmojiBurst(accepted);
       currentIndex++;
-      modal.style.transform = 'translateX(0px)';
-      showNextDiff();
+      setTimeout(showNextDiff, 300);
     }
 
     function formatText(text) {
@@ -247,54 +288,6 @@
       link.style = 'display:block;margin-top:20px;color:#fff;font-weight:bold;';
       document.querySelector('main').appendChild(link);
     }
-
-    const modal = document.getElementById('modalContent');
-    let startX = null;
-    let currentX = 0;
-    let dragging = false;
-
-    modal.addEventListener('mousedown', e => {
-      startX = e.clientX;
-      dragging = true;
-      modal.style.transition = 'none';
-    });
-
-    document.addEventListener('mousemove', e => {
-      if (!dragging) return;
-      currentX = e.clientX - startX;
-      modal.style.transform = `translateX(${currentX}px)`;
-    });
-
-    document.addEventListener('mouseup', () => {
-      if (!dragging) return;
-      dragging = false;
-      modal.style.transition = 'transform 0.3s ease';
-      if (Math.abs(currentX) > 100) {
-        validateChange(currentX > 0);
-      } else {
-        modal.style.transform = 'translateX(0px)';
-      }
-      currentX = 0;
-    });
-
-    modal.addEventListener('touchstart', e => {
-      startX = e.touches[0].clientX;
-    });
-
-    modal.addEventListener('touchmove', e => {
-      const moveX = e.touches[0].clientX - startX;
-      modal.style.transform = `translateX(${moveX}px)`;
-    });
-
-    modal.addEventListener('touchend', e => {
-      const endX = e.changedTouches[0].clientX;
-      const deltaX = endX - startX;
-      if (Math.abs(deltaX) > 50) {
-        validateChange(deltaX > 0);
-      } else {
-        modal.style.transform = 'translateX(0px)';
-      }
-    });
   </script>
 </body>
 </html>
