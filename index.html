@@ -537,7 +537,15 @@ const key = document.getElementById("openaiKey").value.replace(/[^\x20-\x7E]/g, 
       }
 
       const data = await response.json();
-      const content = data.choices[0].message.content;
+      console.log("🧠 Réponse brute de GPT :", data);
+
+      const content = data?.choices?.[0]?.message?.content;
+
+      if (!content) {
+            console.error("🧨 Réponse reçue sans contenu CSV :", data);
+            throw new Error("Réponse GPT vide ou mal formée.");
+          }
+
 
       // Génération du lien de téléchargement
       const blob = new Blob([content], { type: "text/csv" });
@@ -581,7 +589,11 @@ const key = document.getElementById("openaiKey").value.replace(/[^\x20-\x7E]/g, 
     reader.onload = async function (e) {
       const csvText = e.target.result;
 
-      const prompt = `Voici un fichier CSV. Remplace toutes les valeurs de la colonne "article" par le mot "Minecraft", sans toucher aux autres colonnes.\n\n${csvText}`;
+     const prompt = `Voici un fichier CSV. Remplace toutes les valeurs de la colonne "article" par le mot "Minecraft", sans modifier les autres colonnes.
+
+Réponds uniquement avec le CSV final, sans rien d'autre. Pas de texte d’introduction, pas de commentaires, pas de balise \`\`\`.
+
+${text}`;
 
       status.textContent = "⏳ Envoi à GPT via le Worker...";
 
