@@ -6,7 +6,7 @@
   <link rel="icon" href="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
-   body {
+    body {
       font-family: 'Nunito', sans-serif;
       margin: 0;
       padding: 0;
@@ -98,6 +98,30 @@
       background: #e0ffe0;
       color: #333;
     }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://s3-eu-west-1.amazonaws.com/tpd/logos/652d2eaf70beb7b68772d519/0x0.png" alt="LIZY Logo">
+    <h1>LIZY Comparateur 🔀</h1>
+  </header>
+
+  <main>
+    <p>Comparez deux fichiers CSV et validez les modifications manuellement</p>
+
+    <input type="file" id="originalCSV" accept=".csv">
+    <input type="file" id="modifiedCSV" accept=".csv">
+    <button onclick="compareCSVs()">📊 Comparer les fichiers</button>
+    <div id="status"></div>
+  </main>
+
+  <div id="diffModal">
+    <div id="modalContent">
+      <h2>Validation d'une modification</h2>
+      <div id="originalDisplay" class="cellContent originalText"></div>
+      <div id="modifiedDisplay" class="cellContent modifiedText"></div>
+    </div>
+  </div>
 
   <script>
     let differences = [];
@@ -108,8 +132,8 @@
 
     function parseCSV(text) {
   const rows = [];
-  let current = [];
-  let cell = '';
+  let row = [];
+  let current = '';
   let inQuotes = false;
 
   for (let i = 0; i < text.length; i++) {
@@ -117,27 +141,28 @@
     const nextChar = text[i + 1];
 
     if (char === '"' && inQuotes && nextChar === '"') {
-      cell += '"';
-      i++; // skip escaped quote
+      current += '"'; // escaped quote
+      i++;
     } else if (char === '"') {
       inQuotes = !inQuotes;
     } else if (char === ',' && !inQuotes) {
-      current.push(cell);
-      cell = '';
+      row.push(current);
+      current = '';
     } else if ((char === '\n' || char === '\r') && !inQuotes) {
-      if (cell || char === '\n') current.push(cell);
-      if (current.length) rows.push(current);
-      current = [];
-      cell = '';
-      if (char === '\r' && nextChar === '\n') i++; // Windows-style newline
+      if (char === '\r' && nextChar === '\n') i++; // handle \r\n
+      row.push(current);
+      rows.push(row);
+      row = [];
+      current = '';
     } else {
-      cell += char;
+      current += char;
     }
   }
 
-  if (cell || current.length) {
-    current.push(cell);
-    rows.push(current);
+  // dernière cellule
+  if (current || row.length > 0) {
+    row.push(current);
+    rows.push(row);
   }
 
   return rows;
