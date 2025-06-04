@@ -113,18 +113,9 @@
       100% { opacity: 0; transform: translate(-50%, 100%) scale(0.5); }
     }
 
-    .actionButtons {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 20px;
-    }
-
-    .actionButtons button {
-      font-size: 20px;
-      padding: 10px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    .highlight {
+      background-color: yellow;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -148,10 +139,8 @@
       <h2>Validation d'une modification</h2>
       <div id="originalDisplay" class="cellContent originalText"></div>
       <div id="modifiedDisplay" class="cellContent modifiedText"></div>
-      <div class="actionButtons">
-        <button onclick="validateChange(true)">⬅️<br>Validé</button>
-        <button onclick="validateChange(false)">➡️<br>Invalidé</button>
-      </div>
+      <button onclick="validateChange(true)">⬅️ Validé</button>
+      <button onclick="validateChange(false)">➡️ Invalidé</button>
     </div>
   </div>
 
@@ -196,6 +185,21 @@
         rows.push(row);
       }
       return rows;
+    }
+
+    function highlightDiff(orig, mod) {
+      if (orig === mod) return [orig, mod];
+      let start = 0;
+      while (start < orig.length && orig[start] === mod[start]) start++;
+      let endOrig = orig.length - 1;
+      let endMod = mod.length - 1;
+      while (endOrig > start && endMod > start && orig[endOrig] === mod[endMod]) {
+        endOrig--;
+        endMod--;
+      }
+      const origHighlighted = orig.substring(0, start) + '<span class="highlight">' + orig.substring(start, endOrig + 1) + '</span>' + orig.substring(endOrig + 1);
+      const modHighlighted = mod.substring(0, start) + '<span class="highlight">' + mod.substring(start, endMod + 1) + '</span>' + mod.substring(endMod + 1);
+      return [origHighlighted, modHighlighted];
     }
 
     async function compareCSVs() {
@@ -249,8 +253,9 @@
       }
 
       const { orig, mod } = differences[currentIndex];
-      document.getElementById('originalDisplay').innerHTML = `<strong>Original :</strong><br>${formatText(orig)}`;
-      document.getElementById('modifiedDisplay').innerHTML = `<strong>Modifié :</strong><br>${formatText(mod)}`;
+      const [highlightedOrig, highlightedMod] = highlightDiff(orig, mod);
+      document.getElementById('originalDisplay').innerHTML = `<strong>Original :</strong><br>${formatText(highlightedOrig)}`;
+      document.getElementById('modifiedDisplay').innerHTML = `<strong>Modifié :</strong><br>${formatText(highlightedMod)}`;
       document.getElementById('diffModal').style.display = 'flex';
     }
 
@@ -268,7 +273,7 @@
 
     function validateChange(accepted) {
       const { i, j, orig, mod } = differences[currentIndex];
-      mergedRows[i][j] = accepted ? mod : orig;
+      mergedRows[i][j] = accepted ? orig : mod;
       showEmojiBurst(accepted);
       currentIndex++;
       setTimeout(showNextDiff, 300);
