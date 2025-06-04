@@ -77,16 +77,24 @@
       color: #000;
       padding: 30px;
       border-radius: 15px;
-      width: 80%;
-      max-width: 600px;
-      text-align: center;
+      width: 90%;
+      max-width: 1000px;
+      max-height: 80vh;
+      overflow-y: auto;
+      text-align: left;
       position: relative;
+    }
+
+    .contentContainer {
+      display: flex;
+      gap: 20px;
     }
 
     .cellContent {
       padding: 10px;
       border-radius: 8px;
-      margin-bottom: 15px;
+      flex: 1;
+      overflow-wrap: break-word;
     }
 
     .originalText {
@@ -137,10 +145,14 @@
   <div id="diffModal">
     <div id="modalContent">
       <h2>Validation d'une modification</h2>
-      <div id="originalDisplay" class="cellContent originalText"></div>
-      <div id="modifiedDisplay" class="cellContent modifiedText"></div>
-      <button onclick="validateChange(true)">⬅️ Validé</button>
-      <button onclick="validateChange(false)">➡️ Invalidé</button>
+      <div class="contentContainer">
+        <div id="originalDisplay" class="cellContent originalText"></div>
+        <div id="modifiedDisplay" class="cellContent modifiedText"></div>
+      </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <button onclick="validateChange(true)">⬅️ Validé</button>
+        <button onclick="validateChange(false)">➡️ Invalidé</button>
+      </div>
     </div>
   </div>
 
@@ -280,7 +292,9 @@
     }
 
     function formatText(text) {
-      return text.replace(/<a /gi, '<a style="color:#FF007A;font-weight:bold;" ');
+      return text
+        .replace(/<a /gi, '<a style="color:#FF007A;font-weight:bold;" ')
+        .replace(/<img /gi, '<img style="max-width:100%;height:auto;" ');
     }
 
     function generateMergedCSV() {
