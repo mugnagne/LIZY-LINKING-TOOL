@@ -462,17 +462,28 @@ function enrichCSVArticleColumn() {
       let index = 0;
 
       for (const level of priorityLinks) {
-        for (const word in level) {
-          const url = level[word];
-          const regex = new RegExp(escapeRegExp(word), 'gi');
-          cell = cell.replace(regex, match => {
-            const placeholder = `@@@${index}@@@`;
-            placeholders.push({ placeholder, html: `<a href="${url}" target="_blank">${match}</a>` });
-            index++;
-            return placeholder;
-          });
-        }
-      }
+  for (const word in level) {
+    const url = level[word];
+    cell = cell.toLowerCase();
+
+
+    // on travaille sur une version temporaire en minuscule
+    let tempCell = cell;
+
+    const regex = new RegExp(`\\b${escaped}[.,!?;:"]?\\b`, 'gi');
+    tempCell = tempCell.replace(regex, match => {
+      const placeholder = `@@@${index}@@@`;
+      placeholders.push({
+        placeholder,
+        html: `<a href="${url}" target="_blank" style="color: #FF007A; text-decoration: underline;">${match}</a>`
+      });
+      index++;
+      return placeholder;
+    });
+
+    cell = tempCell;
+  }
+}
 
       for (const item of placeholders) {
         cell = cell.replace(item.placeholder, item.html);
