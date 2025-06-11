@@ -422,6 +422,7 @@ setTimeout(() => document.getElementById("feedback").textContent = '', 3000);
     document.getElementById("csvStatus").style.color = "red";
   }
 }
+
 function enrichCSVArticleColumn() {
   const fileInput = document.getElementById('csvFile');
   const file = fileInput.files[0];
@@ -458,35 +459,45 @@ function enrichCSVArticleColumn() {
       if (rowIndex === 0) return row; // skip header
       let cell = row[articleIndex];
       if (!cell) return row;
+
+      // Ne pas enrichir les titres
+      if (/^<h[1-4][^>]*>/i.test(cell)) return row;
+
       const placeholders = [];
       let index = 0;
 
- for (const level of priorityLinks) {
-  for (const word in level) {
-    const url = level[word];
-    const cleanWord = word.toLowerCase();
-    const escaped = escapeRegExp(cleanWord);
+      for (const level of priorityLinks) {
+        for (const word in level) {
+          const url = level[word];
+          const cleanWord = word.toLowerCase();
+          const escaped = escapeRegExp(cleanWord);
+          const regex = new RegExp(`(?![^<]*?>)\\b${escaped}[.,!?;:"]?\\b`, 'gi');
 
-    const regex = new RegExp(`\\b${escaped}[.,!?;:"]?\\b`, 'gi');
+          let match;
+          const matchPositions = [];
 
-    let match;
-    while ((match = regex.exec(cell)) !== null) {
-      const originalMatch = match[0]; // conserve la casse d'origine
-      const placeholder = `@@@${index}@@@`;
+          while ((match = regex.exec(cell)) !== null) {
+            matchPositions.push({
+              index: match.index,
+              length: match[0].length,
+              text: match[0],
+              url
+            });
+          }
 
-      placeholders.push({
-        placeholder,
-        html: `<a href="${url}" target="_blank" style="color: #FF007A; text-decoration: underline;">${originalMatch}</a>`
-      });
-
-      // Remplacement immédiat dans la cellule (attention à ne pas boucler sur une version modifiée)
-      cell = cell.substring(0, match.index) + placeholder + cell.substring(match.index + originalMatch.length);
-      regex.lastIndex = match.index + placeholder.length;
-      index++;
-    }
-  }
-}
-
+          // Appliquer les remplacements de fin vers début pour ne pas casser les index
+          for (let i = matchPositions.length - 1; i >= 0; i--) {
+            const m = matchPositions[i];
+            const placeholder = `@@@${index}@@@`;
+            cell = cell.slice(0, m.index) + placeholder + cell.slice(m.index + m.length);
+            placeholders.push({
+              placeholder,
+              html: `<a href="${m.url}" target="_blank" style="color: #FF007A; text-decoration: underline;">${m.text}</a>`
+            });
+            index++;
+          }
+        }
+      }
 
       for (const item of placeholders) {
         cell = cell.replace(item.placeholder, item.html);
@@ -507,6 +518,7 @@ function enrichCSVArticleColumn() {
   };
   reader.readAsText(file);
 }
+
 
 
 function copyHTML() {
