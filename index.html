@@ -305,25 +305,31 @@
   const linkCountMap = {};
   const priorityCounts = [0, 0, 0];
 
-  for (let i = 0; i < priorityLinks.length; i++) {
-    const level = priorityLinks[i];
-    for (const word in level) {
-      const url = level[word];
-      const escaped = escapeRegExp(word);
-      const regex = new RegExp(escaped, 'gi');
-      text = text.replace(regex, match => {
-        const placeholder = `@@@${index}@@@`;
-        placeholders.push({
-          placeholder,
-          html: `<a href="${url}" target="_blank" style="color: #FF007A; text-decoration: underline;">${match}</a>`
-        });
-        linkCountMap[url] = (linkCountMap[url] || 0) + 1;
-        priorityCounts[i]++;
-        index++;
-        return placeholder;
+for (let i = 0; i < priorityLinks.length; i++) {
+  const level = priorityLinks[i];
+  for (const word in level) {
+    const url = level[word];
+    const escaped = escapeRegExp(word);
+    const regex = new RegExp(`\\b${escaped}[.,!?;:]?\\b`, 'gi');
+
+    text = text.replace(regex, match => {
+      const matchClean = match.replace(/[.,!?;:]/g, '').toLowerCase();
+      const wordClean = word.toLowerCase();
+      if (matchClean !== wordClean) return match;
+
+      const placeholder = `@@@${index}@@@`;
+      placeholders.push({
+        placeholder,
+        html: `<a href="${url}" target="_blank" style="color: #FF007A; text-decoration: underline;">${match}</a>`
       });
-    }
+      linkCountMap[url] = (linkCountMap[url] || 0) + 1;
+      priorityCounts[i]++;
+      index++;
+      return placeholder;
+    });
   }
+}
+
 
   for (const item of placeholders) {
     text = text.replace(item.placeholder, item.html);
